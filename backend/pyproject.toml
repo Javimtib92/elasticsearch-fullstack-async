@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "backend"
+name = "app"
 version = "0.1.0"
 description = ""
 authors = ["Javier Muñoz Tous <javimtib92@gmail.com>"]
@@ -8,6 +8,11 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.3.5"
+
+[tool.ruff]
+target-version = "py312"
 
 [build-system]
 requires = ["poetry-core"]
