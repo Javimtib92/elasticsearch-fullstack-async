@@ -1,0 +1,18 @@
+services:
+  backend:
+    image: '${DOCKER_IMAGE_BACKEND}:${TAG-latest}'
+    restart: always
+    networks:
+      - default
+    env_file:
+      - .env
+    environment:
+      - DOMAIN=${DOMAIN}
+      - ENVIRONMENT=${ENVIRONMENT}
+    build:
+      context: ./backend
+      args:
+        INSTALL_DEV: ${INSTALL_DEV}
+    ports:
+      - "127.0.0.1:8080:80"
+    platform: linux/amd64 # Patch for M1 Mac
