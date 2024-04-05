@@ -25,10 +25,13 @@ services:
     build:
       context: ./backend
       args:
-        INSTALL_DEV: ${INSTALL_DEV}
+        INSTALL_DEV: ${INSTALL_DEV-false}
     ports:
       - "127.0.0.1:8080:80"
     platform: linux/amd64 # Patch for M1 Mac
+
+    volumes:
+      - certs:/usr/share/backend/config/certs
 
   elastic_setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
