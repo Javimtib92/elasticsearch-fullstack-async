@@ -1,6 +1,6 @@
 from typing import Union, Optional
 from app.search import Search, get_es
-from fastapi import FastAPI, Depends, File, UploadFile, HTTPException
+from fastapi import FastAPI, Depends, File, UploadFile, HTTPException, Query
 import csv
 from elasticsearch.helpers import async_streaming_bulk
 from elasticsearch import AsyncElasticsearch
@@ -33,8 +33,11 @@ async def clear_index_endpoint(
     }
 
 
+# using utf-8-sig encoding as suggested by https://github.com/clld/clldutils/issues/65#issuecomment-344953000
 def csv_row_generator(upload_file):
-    with io.TextIOWrapper(upload_file.file, encoding="utf-8", newline="") as text_file:
+    with io.TextIOWrapper(
+        upload_file.file, encoding="utf-8-sig", newline=""
+    ) as text_file:
         csv_reader = csv.reader(text_file, delimiter=";")
 
         headers = next(csv_reader)
@@ -60,16 +63,49 @@ async def bulk(file: UploadFile = File(...), es: Optional[Search] = Depends(get_
         actions=csv_row_generator(file),
         raise_on_error=True,
     ):
-        _, result = result.popitem()
+        action, result = result.popitem()
         if not ok:
-            print("failed to %s document %s" % ())
+            print("failed to %s document %s" % (action, result["_id"]))
 
     return {"status": "ok"}
 
 
 @app.get("/politicians")
-def get_all_politicians(filter: Union[str, None] = None):
-    return {"Hello": "World", "filter": filter}
+async def get_all_politicians(
+    page: int = Query(1, ge=1),
+    per_page: int = Query(10, le=100),
+    name: str = None,
+    party: str = None,
+    political_occupation: str = None,
+    es: Optional[Search] = Depends(get_es),
+):
+    query = {"bool": {"must": [], "filter": {}}}
+
+    if name:
+        query["bool"]["must"].append(
+            {"match": {"nombre": {"query": name, "fuzziness": "auto"}}}
+        )
+
+    if party or political_occupation:
+        terms_filter = {}
+        if party:
+            party_list = party.split(",")
+            terms_filter["partido_para_filtro"] = party_list
+        if political_occupation:
+            political_occupation_list = political_occupation.split(",")
+            terms_filter["cargo_para_filtro"] = political_occupation_list
+
+        query["bool"]["filter"]["terms"] = terms_filter
+
+    result = await es.search(
+        index="politicians",
+        body={
+            "query": query,
+            "from": (page - 1) * per_page,
+            "size": per_page,
+        },
+    )
+    return result
 
 
 @app.get("/politicians/{id}")
