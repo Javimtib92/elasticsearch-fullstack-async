@@ -1,13 +1,14 @@
 import io
 import csv
 from typing import Optional
-from app.search import Search, get_es
-from app.schemas import PoliticianUpdate
+from app.search import Search, get_es, create_es_mapping
+from app.schemas import Politician, PoliticianUpdate
+from app.utils import is_float
 
 from fastapi import FastAPI, Depends, File, UploadFile, HTTPException, Query
 from fastapi.encoders import jsonable_encoder
-from elasticsearch.helpers import async_streaming_bulk
 from elasticsearch import AsyncElasticsearch, NotFoundError
+from elasticsearch.helpers import async_streaming_bulk
 
 
 app = FastAPI()
@@ -36,14 +37,6 @@ async def clear_index_endpoint(
     }
 
 
-def isfloat(num):
-    try:
-        float(num.replace(",", "."))
-        return True
-    except ValueError:
-        return False
-
-
 # using utf-8-sig encoding as suggested by https://github.com/clld/clldutils/issues/65#issuecomment-344953000
 def csv_row_generator(upload_file):
     with io.TextIOWrapper(
@@ -58,7 +51,7 @@ def csv_row_generator(upload_file):
             for index, header in enumerate(headers):
                 value = row[index]
 
-                if isfloat(value):
+                if is_float(value):
                     value = float(value.replace(",", "."))
 
                 data[header.lower()] = value
@@ -72,11 +65,7 @@ async def bulk(file: UploadFile = File(...), es: Optional[Search] = Depends(get_
         return {"error": "Only CSV files are supported"}
 
     if not (await es.indices.exists(index="politicians")):
-        mapping = {
-            "mappings": {
-                "dynamic": True,
-            }
-        }
+        mapping = {"mappings": {"properties": create_es_mapping(Politician)}}
         await es.indices.create(index="politicians", body=mapping)
 
     async for ok, result in async_streaming_bulk(
@@ -121,7 +110,7 @@ async def get_all_politicians(
 
         query["bool"]["filter"]["terms"] = terms_filter
 
-    result = await es.search(
+    response = await es.search(
         index="politicians",
         body={
             "query": query,
@@ -129,14 +118,19 @@ async def get_all_politicians(
             "size": per_page,
         },
     )
-    return result
+
+    hits = response["hits"]["hits"]
+
+    extracted_hits = [{"_id": hit["_id"], **hit["_source"]} for hit in hits]
+
+    return extracted_hits
 
 
 @app.get("/politicians/{id}")
 async def get_politician_by_id(item_id: str, es: Optional[Search] = Depends(get_es)):
     try:
         result = await es.get(index="politicians", id=item_id)
-        return result["_source"]
+        return {"_id": result["_id"], **result["_source"]}
 
     except NotFoundError:
         raise HTTPException(status_code=404, detail="Politician not found")
@@ -168,5 +162,31 @@ async def delete_politician(item_id: str, es: Optional[Search] = Depends(get_es)
 
 
 @app.get("/statistics")
-def get_statistics():
-    return {"Hello": "World"}
+async def get_statistics(es: Optional[Search] = Depends(get_es)):
+    es_query = {
+        "query": {"match_all": {}},
+        "size": 10,
+        "sort": [{"sueldobase_sueldo": {"order": "desc"}}],
+        "aggs": {
+            "mean_salary": {"avg": {"field": "sueldobase_sueldo"}},
+            "median_salary": {
+                "percentiles": {"field": "sueldobase_sueldo", "percents": [50]}
+            },
+        },
+    }
+
+    # Execute the query
+    response = await es.search(index="politicians", body=es_query)
+    hits = response["hits"]["hits"]
+    mean_salary = round(response["aggregations"]["mean_salary"]["value"], 2)
+    median_salary = round(
+        response["aggregations"]["median_salary"]["values"]["50.0"], 2
+    )
+
+    extracted_hits = [{"_id": hit["_id"], **hit["_source"]} for hit in hits]
+
+    return {
+        "mean_salary": mean_salary,
+        "median_salary": median_salary,
+        "top_salaries": extracted_hits,
+    }
