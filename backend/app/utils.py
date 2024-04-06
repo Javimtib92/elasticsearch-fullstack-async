@@ -9,11 +9,22 @@ def partial_model(model: Type[BaseModel]):
     """
     Create a partial Pydantic model where all fields are optional.
 
+    Usage:
+
+    ```python
+    @partial_model
+    class PoliticianUpdate(Politician):
+        pass
+    ```
+
     Args:
         model (Type[BaseModel]): The Pydantic model to create a partial version of.
 
     Returns:
         Type[BaseModel]: The partial Pydantic model.
+
+    Reference:
+        https://github.com/pydantic/pydantic/issues/3120#issuecomment-1528030416
     """
 
     def make_field_optional(
@@ -49,6 +60,13 @@ def is_float(num):
     """
     Check if a string can be converted to a float.
 
+    Usage:
+
+    ```python
+    is_float("0.3") # true
+    is_float("0,3") # true
+    is_float("s0.3") # false
+    ```
     Args:
         num (str): The string to check.
 

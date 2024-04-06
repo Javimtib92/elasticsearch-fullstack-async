@@ -14,13 +14,13 @@ from app.utils import is_float
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI, es: Optional[Search] = Depends(get_es)):
+async def lifespan(_: FastAPI, es: Optional[Search] = Depends(get_es)):
     """
     Context manager to handle the lifespan of Elasticsearch connection.
     It yields control to the caller and automatically closes the Elasticsearch connection when exiting the context.
 
     Args:
-        app (FastAPI): The FastAPI instance.
+        _ (FastAPI): The FastAPI instance.
         es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
 
     Yields:
@@ -71,7 +71,6 @@ async def clear_index_endpoint(
     }
 
 
-# using utf-8-sig encoding as suggested by https://github.com/clld/clldutils/issues/65#issuecomment-344953000
 def csv_row_generator(upload_file):
     """
     Generator function to convert CSV rows into Elasticsearch actions.
@@ -83,7 +82,10 @@ def csv_row_generator(upload_file):
         dict: Elasticsearch action for each row in the CSV.
     """
     with io.TextIOWrapper(
-        upload_file.file, encoding="utf-8-sig", newline=""
+        upload_file.file,
+        # using utf-8-sig encoding as suggested by https://github.com/clld/clldutils/issues/65#issuecomment-344953000
+        encoding="utf-8-sig",
+        newline="",
     ) as text_file:
         csv_reader = csv.reader(text_file, delimiter=";")
 
