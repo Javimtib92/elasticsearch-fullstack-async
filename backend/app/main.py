@@ -1,11 +1,14 @@
-from typing import Union, Optional
-from app.search import Search, get_es
-from fastapi import FastAPI, Depends, File, UploadFile, HTTPException, Query
-import csv
-from elasticsearch.helpers import async_streaming_bulk
-from elasticsearch import AsyncElasticsearch
-
 import io
+import csv
+from typing import Optional
+from app.search import Search, get_es
+from app.schemas import PoliticianUpdate
+
+from fastapi import FastAPI, Depends, File, UploadFile, HTTPException, Query
+from fastapi.encoders import jsonable_encoder
+from elasticsearch.helpers import async_streaming_bulk
+from elasticsearch import AsyncElasticsearch, NotFoundError
+
 
 app = FastAPI()
 
@@ -109,18 +112,38 @@ async def get_all_politicians(
 
 
 @app.get("/politicians/{id}")
-def get_politician_by_id(item_id: int):
-    return {"operation": "get", "id": item_id}
+async def get_politician_by_id(item_id: str, es: Optional[Search] = Depends(get_es)):
+    try:
+        result = await es.get(index="politicians", id=item_id)
+        return result["_source"]
+
+    except NotFoundError:
+        raise HTTPException(status_code=404, detail="Politician not found")
 
 
 @app.patch("/politicians/{id}")
-def update_politician(item_id: int):
-    return {"operation": "patch", "id": item_id}
+async def update_politician(
+    item_id: str,
+    politician_update: PoliticianUpdate,
+    es: Optional[Search] = Depends(get_es),
+):
+    try:
+        update_item_encoded = jsonable_encoder(politician_update)
+        await es.update(index="politicians", id=item_id, doc=update_item_encoded)
+        return {"message": f"Politician {item_id} has been updated successfully"}
+
+    except NotFoundError:
+        raise HTTPException(status_code=404, detail="Politician not found")
 
 
 @app.delete("/politicians/{id}")
-def delete_politician(item_id: int):
-    return {"operation": "delete", "id": item_id}
+async def delete_politician(item_id: str, es: Optional[Search] = Depends(get_es)):
+    try:
+        await es.delete(index="politicians", id=item_id)
+        return {"message": f"Politician {item_id} has been deleted successfully"}
+
+    except NotFoundError:
+        raise HTTPException(status_code=404, detail="Politician not found")
 
 
 @app.get("/statistics")
