@@ -1,15 +1,15 @@
 import io
 import csv
 from typing import Optional
-from app.search import Search, get_es, create_es_mapping
-from app.schemas import Politician, PoliticianUpdate
-from app.utils import is_float
 
 from fastapi import FastAPI, Depends, File, UploadFile, HTTPException, Query
 from fastapi.encoders import jsonable_encoder
 from elasticsearch import AsyncElasticsearch, NotFoundError
 from elasticsearch.helpers import async_streaming_bulk
 
+from app.search import Search, get_es, create_es_mapping
+from app.schemas import Politician, PoliticianUpdate
+from app.utils import is_float
 
 app = FastAPI()
 
@@ -64,7 +64,7 @@ async def bulk(file: UploadFile = File(...), es: Optional[Search] = Depends(get_
     if not file.filename.endswith(".csv"):
         return {"error": "Only CSV files are supported"}
 
-    if not (await es.indices.exists(index="politicians")):
+    if not await es.indices.exists(index="politicians"):
         mapping = {"mappings": {"properties": create_es_mapping(Politician)}}
         await es.indices.create(index="politicians", body=mapping)
 
@@ -175,7 +175,6 @@ async def get_statistics(es: Optional[Search] = Depends(get_es)):
         },
     }
 
-    # Execute the query
     response = await es.search(index="politicians", body=es_query)
     hits = response["hits"]["hits"]
     mean_salary = round(response["aggregations"]["mean_salary"]["value"], 2)
