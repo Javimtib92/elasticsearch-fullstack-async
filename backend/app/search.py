@@ -1,6 +1,6 @@
 import os
 
-from typing import Optional, List
+from typing import Optional, List, Dict
 from datetime import datetime
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -10,9 +10,18 @@ load_dotenv()
 
 
 class Search:
+    """
+    Singleton class to handle Elasticsearch connection.
+    """
+
     instance = None
 
-    def __new__(cls):
+    def __new__(cls) -> AsyncElasticsearch:
+        """
+        Creates a new instance of the Search class if it doesn't exist.
+        Returns:
+            AsyncElasticsearch: Elasticsearch client instance.
+        """
         if cls.instance is None:
             cls.instance = super().__new__(cls)
             cls.instance.client = AsyncElasticsearch(
@@ -24,12 +33,15 @@ class Search:
 
 
 async def get_es() -> Optional[Search]:
+    """
+    Asynchronous function to get Elasticsearch instance.
+    Returns:
+        Optional[Search]: Elasticsearch instance.
+    """
     return Search()
 
 
-# Solution inspired by from https://dzone.com/articles/pydantic-and-elasticsearch-dynamic-couple
-
-type_map = {
+type_map: Dict[type, str] = {
     str: "keyword",
     datetime: "date",
     int: "long",
@@ -40,7 +52,14 @@ type_map = {
 }
 
 
-def create_es_mapping(pydantic_model: BaseModel):
+def create_es_mapping(pydantic_model: BaseModel) -> Dict[str, str]:
+    """
+    Creates Elasticsearch mapping from Pydantic model.
+    Args:
+        pydantic_model (BaseModel): Pydantic model for which mapping needs to be created.
+    Returns:
+        dict: Elasticsearch mapping.
+    """
     mapping = {}
     for field, field_type in pydantic_model.__annotations__.items():
         es_field_type = type_map.get(field_type)
@@ -48,11 +67,9 @@ def create_es_mapping(pydantic_model: BaseModel):
             if issubclass(field_type, BaseModel):
                 es_field_type = create_es_mapping(field_type)
             else:
-                # assuming List[BaseModel] for nested types
                 es_field_type = {
                     "type": "nested",
                     "properties": create_es_mapping(field_type.__args__[0]),
                 }
         mapping[field] = {"type": es_field_type}
-    print(mapping)
     return mapping
