@@ -1,22 +1,26 @@
-from typing import Optional
-
+from app.utils import partial_model
 from pydantic import BaseModel
 
 
-class PoliticianUpdate(BaseModel):
-    nombre: Optional[str]
-    partido: Optional[str]
-    partido_para_filtro: Optional[str]
-    genero: Optional[str]
-    cargo_para_filtro: Optional[str]
-    cargo: Optional[str]
-    institucion: Optional[str]
-    ccaa: Optional[str]
-    sueldobase_sueldo: Optional[str]
-    complementos_sueldo: Optional[str]
-    pagasextra_sueldo: Optional[str]
-    otrasdietaseindemnizaciones_sueldo: Optional[str]
-    trienios_sueldo: Optional[str]
-    retribucionmensual: Optional[str]
-    retribucionanual: Optional[str]
-    observaciones: Optional[str]
+class Politician(BaseModel):
+    nombre: str
+    partido: str
+    partido_para_filtro: str
+    genero: str
+    cargo_para_filtro: str
+    cargo: str
+    institucion: str
+    ccaa: str
+    sueldobase_sueldo: float
+    complementos_sueldo: float
+    pagasextra_sueldo: float
+    otrasdietaseindemnizaciones_sueldo: float
+    trienios_sueldo: float
+    retribucionmensual: float
+    retribucionanual: float
+    observaciones: str
+
+
+@partial_model
+class PoliticianUpdate(Politician):
+    pass
