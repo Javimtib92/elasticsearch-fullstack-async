@@ -2,6 +2,7 @@ import io
 import csv
 from typing import Optional
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, File, UploadFile, HTTPException, Query
 from fastapi.encoders import jsonable_encoder
 from elasticsearch import AsyncElasticsearch, NotFoundError
@@ -11,16 +12,39 @@ from app.search import Search, get_es, create_es_mapping
 from app.schemas import Politician, PoliticianUpdate
 from app.utils import is_float
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI, es: Optional[Search] = Depends(get_es)):
+    """
+    Context manager to handle the lifespan of Elasticsearch connection.
+    It yields control to the caller and automatically closes the Elasticsearch connection when exiting the context.
+
+    Args:
+        app (FastAPI): The FastAPI instance.
+        es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
+
+    Yields:
+        None
+    """
+    yield
+
+    es.close()
 
 
-@app.on_event("shutdown")
-async def app_shutdown(es: Optional[Search] = Depends(get_es)):
-    await es.close()
+app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/")
 async def index(es: Optional[Search] = Depends(get_es)):
+    """
+    Route to get the health of the Elasticsearch cluster.
+
+    Args:
+        es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
+
+    Returns:
+        dict: Elasticsearch cluster health information.
+    """
     return await es.cluster.health()
 
 
@@ -28,6 +52,16 @@ async def index(es: Optional[Search] = Depends(get_es)):
 async def clear_index_endpoint(
     index_name: str, es: AsyncElasticsearch = Depends(get_es)
 ):
+    """
+    Route to clear all documents in a specified index.
+
+    Args:
+        index_name (str): Name of the index to clear.
+        es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
+
+    Returns:
+        dict: Confirmation message if successful.
+    """
     if not await es.indices.exists(index=index_name):
         raise HTTPException(status_code=404, detail="Index not found")
 
@@ -39,6 +73,15 @@ async def clear_index_endpoint(
 
 # using utf-8-sig encoding as suggested by https://github.com/clld/clldutils/issues/65#issuecomment-344953000
 def csv_row_generator(upload_file):
+    """
+    Generator function to convert CSV rows into Elasticsearch actions.
+
+    Args:
+        upload_file (UploadFile): Uploaded CSV file.
+
+    Yields:
+        dict: Elasticsearch action for each row in the CSV.
+    """
     with io.TextIOWrapper(
         upload_file.file, encoding="utf-8-sig", newline=""
     ) as text_file:
@@ -61,6 +104,16 @@ def csv_row_generator(upload_file):
 
 @app.post("/bulk")
 async def bulk(file: UploadFile = File(...), es: Optional[Search] = Depends(get_es)):
+    """
+    Route to bulk upload politicians' data from a CSV file to Elasticsearch.
+
+    Args:
+        file (UploadFile): Uploaded CSV file.
+        es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
+
+    Returns:
+        dict: Confirmation message if successful.
+    """
     if not file.filename.endswith(".csv"):
         return {"error": "Only CSV files are supported"}
 
@@ -90,6 +143,20 @@ async def get_all_politicians(
     political_occupation: str = None,
     es: Optional[Search] = Depends(get_es),
 ):
+    """
+    Route to retrieve all politicians with optional filtering.
+
+    Args:
+        page (int): Page number for pagination (default 1).
+        per_page (int): Number of items per page (default 10, max 100).
+        name (str): Filter by politician's name.
+        party (str): Filter by politician's party.
+        political_occupation (str): Filter by politician's occupation.
+        es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
+
+    Returns:
+        List[Dict[str, Any]]: List of politician records.
+    """
     query = {"bool": {"must": []}}
 
     if name:
@@ -128,6 +195,16 @@ async def get_all_politicians(
 
 @app.get("/politicians/{id}")
 async def get_politician_by_id(item_id: str, es: Optional[Search] = Depends(get_es)):
+    """
+    Route to retrieve a politician by ID.
+
+    Args:
+        item_id (str): ID of the politician.
+        es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
+
+    Returns:
+        Dict[str, Any]: Politician record.
+    """
     try:
         result = await es.get(index="politicians", id=item_id)
         return {"_id": result["_id"], **result["_source"]}
@@ -142,6 +219,17 @@ async def update_politician(
     politician_update: PoliticianUpdate,
     es: Optional[Search] = Depends(get_es),
 ):
+    """
+    Route to update a politician's information.
+
+    Args:
+        item_id (str): ID of the politician.
+        politician_update (PoliticianUpdate): Data to update.
+        es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
+
+    Returns:
+        dict: Confirmation message if successful.
+    """
     try:
         update_item_encoded = jsonable_encoder(politician_update)
         await es.update(index="politicians", id=item_id, doc=update_item_encoded)
@@ -153,6 +241,16 @@ async def update_politician(
 
 @app.delete("/politicians/{id}")
 async def delete_politician(item_id: str, es: Optional[Search] = Depends(get_es)):
+    """
+    Route to delete a politician by ID.
+
+    Args:
+        item_id (str): ID of the politician.
+        es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
+
+    Returns:
+        dict: Confirmation message if successful.
+    """
     try:
         await es.delete(index="politicians", id=item_id)
         return {"message": f"Politician {item_id} has been deleted successfully"}
@@ -163,6 +261,15 @@ async def delete_politician(item_id: str, es: Optional[Search] = Depends(get_es)
 
 @app.get("/statistics")
 async def get_statistics(es: Optional[Search] = Depends(get_es)):
+    """
+    Route to retrieve statistics about politicians' salaries.
+
+    Args:
+        es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
+
+    Returns:
+        dict: Statistics including mean salary, median salary, and top salaries.
+    """
     es_query = {
         "query": {"match_all": {}},
         "size": 10,
