@@ -36,6 +36,14 @@ async def clear_index_endpoint(
     }
 
 
+def isfloat(num):
+    try:
+        float(num.replace(",", "."))
+        return True
+    except ValueError:
+        return False
+
+
 # using utf-8-sig encoding as suggested by https://github.com/clld/clldutils/issues/65#issuecomment-344953000
 def csv_row_generator(upload_file):
     with io.TextIOWrapper(
@@ -48,7 +56,13 @@ def csv_row_generator(upload_file):
         for row in csv_reader:
             data = {}
             for index, header in enumerate(headers):
-                data[header.lower()] = row[index]
+                value = row[index]
+
+                if isfloat(value):
+                    value = float(value.replace(",", "."))
+
+                data[header.lower()] = value
+
             yield {"_index": "politicians", **data}
 
 
@@ -58,7 +72,12 @@ async def bulk(file: UploadFile = File(...), es: Optional[Search] = Depends(get_
         return {"error": "Only CSV files are supported"}
 
     if not (await es.indices.exists(index="politicians")):
-        await es.indices.create(index="politicians")
+        mapping = {
+            "mappings": {
+                "dynamic": True,
+            }
+        }
+        await es.indices.create(index="politicians", body=mapping)
 
     async for ok, result in async_streaming_bulk(
         client=es,
@@ -82,7 +101,7 @@ async def get_all_politicians(
     political_occupation: str = None,
     es: Optional[Search] = Depends(get_es),
 ):
-    query = {"bool": {"must": [], "filter": {}}}
+    query = {"bool": {"must": []}}
 
     if name:
         query["bool"]["must"].append(
@@ -90,6 +109,8 @@ async def get_all_politicians(
         )
 
     if party or political_occupation:
+        query["bool"]["filter"] = {}
+
         terms_filter = {}
         if party:
             party_list = party.split(",")
