@@ -1,2 +1,2 @@
 .vscode
-.env
+#.env -> commented on purpose for simplicity of the setup
