@@ -23,6 +23,25 @@ class Politician(BaseModel):
     retribucionanual: float
     observaciones: str
 
+    @field_validator(
+        "sueldobase_sueldo",
+        "complementos_sueldo",
+        "pagasextra_sueldo",
+        "otrasdietaseindemnizaciones_sueldo",
+        "trienios_sueldo",
+        "retribucionmensual",
+        "retribucionanual",
+        mode="before",
+    )
+    @classmethod
+    def string_to_float(cls, value: str) -> float:
+        if value == "":
+            return 0.0
+        try:
+            return float(value)
+        except ValueError:
+            raise ValueError("Could not convert string to float")
+
 
 @partial_model
 class PoliticianUpdate(Politician):
