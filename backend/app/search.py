@@ -1,10 +1,10 @@
 import os
-
-from typing import Optional, List, Dict
 from datetime import datetime
-from pydantic import BaseModel
+from typing import Dict, List, Optional
+
 from dotenv import load_dotenv
 from elasticsearch import AsyncElasticsearch
+from pydantic import BaseModel
 
 load_dotenv()
 

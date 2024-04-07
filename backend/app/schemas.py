@@ -1,5 +1,6 @@
-from app.utils import partial_model
 from pydantic import BaseModel
+
+from app.utils import partial_model
 
 
 class Politician(BaseModel):

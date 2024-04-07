@@ -1,15 +1,15 @@
-import io
 import csv
+import io
+from contextlib import asynccontextmanager
 from typing import Optional
 
-from contextlib import asynccontextmanager
-from fastapi import FastAPI, Depends, File, UploadFile, HTTPException, Query
-from fastapi.encoders import jsonable_encoder
 from elasticsearch import AsyncElasticsearch, NotFoundError
 from elasticsearch.helpers import async_streaming_bulk
+from fastapi import Depends, FastAPI, File, HTTPException, Query, UploadFile
+from fastapi.encoders import jsonable_encoder
 
-from app.search import Search, get_es, create_es_mapping
 from app.schemas import Politician, PoliticianUpdate
+from app.search import Search, create_es_mapping, get_es
 from app.utils import is_float
 
 
