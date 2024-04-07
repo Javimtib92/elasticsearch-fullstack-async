@@ -465,20 +465,6 @@ files = [
 ]
 
 [[package]]
-name = "mirakuru"
-version = "2.5.2"
-description = "Process executor (not only) for tests."
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "mirakuru-2.5.2-py3-none-any.whl", hash = "sha256:90c2d90a8cf14349b2f33e6db30a16acd855499811e0312e56cf80ceacf2d3e5"},
-    {file = "mirakuru-2.5.2.tar.gz", hash = "sha256:41ca583d355eb7a6cfdc21c1aea549979d685c27b57239b88725434f115a7132"},
-]
-
-[package.dependencies]
-psutil = {version = ">=4.0.0", markers = "sys_platform != \"cygwin\""}
-
-[[package]]
 name = "multidict"
 version = "6.0.5"
 description = "multidict implementation"
@@ -602,45 +588,6 @@ files = [
 [package.extras]
 dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
-
-[[package]]
-name = "port-for"
-version = "0.7.2"
-description = "Utility that helps with local TCP ports management. It can find an unused TCP localhost port and remember the association."
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "port-for-0.7.2.tar.gz", hash = "sha256:074f29335130578aa42fef3726985e57d01c15189e509633a8a1b0b7f9226349"},
-    {file = "port_for-0.7.2-py3-none-any.whl", hash = "sha256:16b279ab4f210bad33515c45bd9af0c6e048ab24c3b6bbd9cfc7e451782617df"},
-]
-
-[[package]]
-name = "psutil"
-version = "5.9.8"
-description = "Cross-platform lib for process and system monitoring in Python."
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
-files = [
-    {file = "psutil-5.9.8-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:26bd09967ae00920df88e0352a91cff1a78f8d69b3ecabbfe733610c0af486c8"},
-    {file = "psutil-5.9.8-cp27-cp27m-manylinux2010_i686.whl", hash = "sha256:05806de88103b25903dff19bb6692bd2e714ccf9e668d050d144012055cbca73"},
-    {file = "psutil-5.9.8-cp27-cp27m-manylinux2010_x86_64.whl", hash = "sha256:611052c4bc70432ec770d5d54f64206aa7203a101ec273a0cd82418c86503bb7"},
-    {file = "psutil-5.9.8-cp27-cp27mu-manylinux2010_i686.whl", hash = "sha256:50187900d73c1381ba1454cf40308c2bf6f34268518b3f36a9b663ca87e65e36"},
-    {file = "psutil-5.9.8-cp27-cp27mu-manylinux2010_x86_64.whl", hash = "sha256:02615ed8c5ea222323408ceba16c60e99c3f91639b07da6373fb7e6539abc56d"},
-    {file = "psutil-5.9.8-cp27-none-win32.whl", hash = "sha256:36f435891adb138ed3c9e58c6af3e2e6ca9ac2f365efe1f9cfef2794e6c93b4e"},
-    {file = "psutil-5.9.8-cp27-none-win_amd64.whl", hash = "sha256:bd1184ceb3f87651a67b2708d4c3338e9b10c5df903f2e3776b62303b26cb631"},
-    {file = "psutil-5.9.8-cp36-abi3-macosx_10_9_x86_64.whl", hash = "sha256:aee678c8720623dc456fa20659af736241f575d79429a0e5e9cf88ae0605cc81"},
-    {file = "psutil-5.9.8-cp36-abi3-manylinux_2_12_i686.manylinux2010_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:8cb6403ce6d8e047495a701dc7c5bd788add903f8986d523e3e20b98b733e421"},
-    {file = "psutil-5.9.8-cp36-abi3-manylinux_2_12_x86_64.manylinux2010_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d06016f7f8625a1825ba3732081d77c94589dca78b7a3fc072194851e88461a4"},
-    {file = "psutil-5.9.8-cp36-cp36m-win32.whl", hash = "sha256:7d79560ad97af658a0f6adfef8b834b53f64746d45b403f225b85c5c2c140eee"},
-    {file = "psutil-5.9.8-cp36-cp36m-win_amd64.whl", hash = "sha256:27cc40c3493bb10de1be4b3f07cae4c010ce715290a5be22b98493509c6299e2"},
-    {file = "psutil-5.9.8-cp37-abi3-win32.whl", hash = "sha256:bc56c2a1b0d15aa3eaa5a60c9f3f8e3e565303b465dbf57a1b730e7a2b9844e0"},
-    {file = "psutil-5.9.8-cp37-abi3-win_amd64.whl", hash = "sha256:8db4c1b57507eef143a15a6884ca10f7c73876cdf5d51e713151c1236a0e68cf"},
-    {file = "psutil-5.9.8-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:d16bbddf0693323b8c6123dd804100241da461e41d6e332fb0ba6058f630f8c8"},
-    {file = "psutil-5.9.8.tar.gz", hash = "sha256:6be126e3225486dff286a8fb9a06246a5253f4c7c53b475ea5f5ac934e64194c"},
-]
-
-[package.extras]
-test = ["enum34", "ipaddress", "mock", "pywin32", "wmi"]
 
 [[package]]
 name = "pydantic"
@@ -789,23 +736,6 @@ pytest = ">=7.0.0,<9"
 [package.extras]
 docs = ["sphinx (>=5.3)", "sphinx-rtd-theme (>=1.0)"]
 testing = ["coverage (>=6.2)", "hypothesis (>=5.7.1)"]
-
-[[package]]
-name = "pytest-elasticsearch"
-version = "4.1.0"
-description = "Elasticsearch fixtures and fixture factories for Pytest."
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "pytest-elasticsearch-4.1.0.tar.gz", hash = "sha256:0271d57a7c3bd4712643e4a32a9210739d7ae4c0ca804dbd08717cb560b85949"},
-    {file = "pytest_elasticsearch-4.1.0-py3-none-any.whl", hash = "sha256:9f8250cd9ea70316ec19051da20d8e8660c7fd7f11be9e788f134404a2fa0db0"},
-]
-
-[package.dependencies]
-elasticsearch = ">=7"
-mirakuru = "*"
-port-for = ">=0.7.1"
-pytest = ">=7.0"
 
 [[package]]
 name = "pytest-mock"
@@ -1337,4 +1267,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "b94beb0469d6fb933717a5aed7b503698cf820b31c7505a11ba73248da6908a3"
+content-hash = "e25bc13d29bd07621ee649a2265526e7ba525aed15e8ad11283bb333735685fa"
