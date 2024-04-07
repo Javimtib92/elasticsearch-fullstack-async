@@ -1,14 +1,21 @@
 import csv
 import io
 from contextlib import asynccontextmanager
-from typing import Optional
+from typing import List, Optional
 
 from elasticsearch import AsyncElasticsearch, NotFoundError
 from elasticsearch.helpers import async_streaming_bulk
-from fastapi import Depends, FastAPI, File, HTTPException, Query, UploadFile
+from fastapi import Depends, FastAPI, File, HTTPException, Query, UploadFile, status
 from fastapi.encoders import jsonable_encoder
 
-from app.schemas import Politician, PoliticianUpdate
+from app.schemas import (
+    ClusterStatusResponse,
+    ErrorResponse,
+    MessageResponse,
+    Politician,
+    PoliticianUpdate,
+    StatisticsResponse,
+)
 from app.search import Search, create_es_mapping, get_es
 from app.utils import is_float
 
@@ -34,36 +41,45 @@ async def lifespan(_: FastAPI, es: Optional[Search] = Depends(get_es)):
 app = FastAPI(lifespan=lifespan)
 
 
-@app.get("/")
+@app.get(
+    "/",
+    response_model=ClusterStatusResponse,  # default response pydantic model
+    status_code=status.HTTP_200_OK,  # default status code
+    description="Route to get the health of the Elasticsearch cluster.",
+    tags=["cluster"],
+    summary="Get cluster health details",
+    responses={
+        status.HTTP_200_OK: {
+            "model": ClusterStatusResponse,
+            "description": "Cluster details",
+        },
+    },
+)
 async def index(es: Optional[Search] = Depends(get_es)):
-    """
-    Route to get the health of the Elasticsearch cluster.
-
-    \f
-    Args:
-        es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
-
-    Returns:
-        dict: Elasticsearch cluster health information.
-    """
     return await es.cluster.health()
 
 
-@app.delete("/clear_index/{index_name}")
+@app.delete(
+    "/clear_index/{index_name}",
+    response_model=MessageResponse,
+    status_code=status.HTTP_200_OK,
+    description="Route to clear all documents in a specified index.",
+    tags=["indices"],
+    summary="Clear index from elasticsearch",
+    responses={
+        status.HTTP_200_OK: {
+            "model": MessageResponse,
+            "description": "Ok Response",
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            "model": ErrorResponse,
+            "description": "Bad Request Response",
+        },
+    },
+)
 async def clear_index_endpoint(
     index_name: str, es: AsyncElasticsearch = Depends(get_es)
 ):
-    """
-    Route to clear all documents in a specified index.
-
-    \f
-    Args:
-        index_name (str): Name of the index to clear.
-        es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
-
-    Returns:
-        dict: Confirmation message if successful.
-    """
     if not await es.indices.exists(index=index_name):
         raise HTTPException(status_code=404, detail="Index not found")
 
@@ -74,16 +90,6 @@ async def clear_index_endpoint(
 
 
 def csv_row_generator(upload_file):
-    """
-    Generator function to convert CSV rows into Elasticsearch actions.
-
-    \f
-    Args:
-        upload_file (UploadFile): Uploaded CSV file.
-
-    Yields:
-        dict: Elasticsearch action for each row in the CSV.
-    """
     with io.TextIOWrapper(
         upload_file.file,
         # using utf-8-sig encoding as suggested by https://github.com/clld/clldutils/issues/65#issuecomment-344953000
@@ -107,19 +113,25 @@ def csv_row_generator(upload_file):
             yield {"_index": "politicians", **data}
 
 
-@app.post("/bulk")
+@app.post(
+    "/bulk",
+    response_model=MessageResponse,
+    status_code=status.HTTP_200_OK,
+    description="Route to bulk upload politicians' data from a CSV file to Elasticsearch.",
+    tags=["politicians"],
+    summary="Bulk upload CSV politicians file to elasticsearch",
+    responses={
+        status.HTTP_200_OK: {
+            "model": MessageResponse,
+            "description": "Ok Response",
+        },
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+            "model": ErrorResponse,
+            "description": "Unprocessable entity (bad file format)",
+        },
+    },
+)
 async def bulk(file: UploadFile = File(...), es: Optional[Search] = Depends(get_es)):
-    """
-    Route to bulk upload politicians' data from a CSV file to Elasticsearch.
-
-    \f
-    Args:
-        file (UploadFile): Uploaded CSV file.
-        es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
-
-    Returns:
-        dict: Confirmation message if successful.
-    """
     if not file.filename.endswith(".csv"):
         raise HTTPException(status_code=422, detail="Only CSV files are supported")
 
@@ -137,10 +149,27 @@ async def bulk(file: UploadFile = File(...), es: Optional[Search] = Depends(get_
         if not ok:
             print("failed to %s document %s" % (action, result["_id"]))
 
-    return {"status": "ok"}
+    return {"message": "success"}
 
 
-@app.get("/politicians")
+@app.get(
+    "/politicians",
+    response_model=List[Politician],
+    status_code=status.HTTP_200_OK,
+    description="Route to retrieve all politicians with optional filtering.",
+    tags=["politicians"],
+    summary="Get all politicians",
+    responses={
+        status.HTTP_200_OK: {
+            "model": List[Politician],
+            "description": "List of politicians",
+        },
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorResponse,
+            "description": "Index not found",
+        },
+    },
+)
 async def get_all_politicians(
     page: int = Query(1, ge=1),
     per_page: int = Query(10, le=100),
@@ -149,21 +178,6 @@ async def get_all_politicians(
     political_occupation: str = None,
     es: Optional[Search] = Depends(get_es),
 ):
-    """
-    Route to retrieve all politicians with optional filtering.
-
-    \f
-    Args:
-        page (int): Page number for pagination (default 1).
-        per_page (int): Number of items per page (default 10, max 100).
-        name (str): Filter by politician's name.
-        party (str): Filter by politician's party.
-        political_occupation (str): Filter by politician's occupation.
-        es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
-
-    Returns:
-        List[Dict[str, Any]]: List of politician records.
-    """
     query = {"bool": {"must": []}}
 
     if name:
@@ -200,22 +214,28 @@ async def get_all_politicians(
 
         return extracted_hits
     except NotFoundError:
-        raise HTTPException(status_code=500, detail="Index not found")
+        raise HTTPException(status_code=404, detail="Index not found")
 
 
-@app.get("/politicians/{id}")
+@app.get(
+    "/politicians/{id}",
+    response_model=Politician,
+    status_code=status.HTTP_200_OK,
+    description="Route to retrieve a politician by ID.",
+    tags=["politicians"],
+    summary="Get politician by id",
+    responses={
+        status.HTTP_200_OK: {
+            "model": Politician,
+            "description": "Ok Response",
+        },
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorResponse,
+            "description": "Politician not found",
+        },
+    },
+)
 async def get_politician_by_id(item_id: str, es: Optional[Search] = Depends(get_es)):
-    """
-    Route to retrieve a politician by ID.
-
-    \f
-    Args:
-        item_id (str): ID of the politician.
-        es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
-
-    Returns:
-        Dict[str, Any]: Politician record.
-    """
     try:
         result = await es.get(index="politicians", id=item_id)
         return {"_id": result["_id"], **result["_source"]}
@@ -224,24 +244,29 @@ async def get_politician_by_id(item_id: str, es: Optional[Search] = Depends(get_
         raise HTTPException(status_code=404, detail="Politician not found")
 
 
-@app.patch("/politicians/{id}")
+@app.patch(
+    "/politicians/{id}",
+    response_model=MessageResponse,
+    status_code=status.HTTP_200_OK,
+    description="Route to update a politician's information.",
+    tags=["politicians"],
+    summary="update politician",
+    responses={
+        status.HTTP_200_OK: {
+            "model": Politician,
+            "description": "Ok Response",
+        },
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorResponse,
+            "description": "Politician not found",
+        },
+    },
+)
 async def update_politician(
     item_id: str,
     politician_update: PoliticianUpdate,
     es: Optional[Search] = Depends(get_es),
 ):
-    """
-    Route to update a politician's information.
-
-    \f
-    Args:
-        item_id (str): ID of the politician.
-        politician_update (PoliticianUpdate): Data to update.
-        es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
-
-    Returns:
-        dict: Confirmation message if successful.
-    """
     try:
         update_item_encoded = jsonable_encoder(politician_update)
         await es.update(index="politicians", id=item_id, doc=update_item_encoded)
@@ -251,19 +276,25 @@ async def update_politician(
         raise HTTPException(status_code=404, detail="Politician not found")
 
 
-@app.delete("/politicians/{id}")
+@app.delete(
+    "/politicians/{id}",
+    response_model=MessageResponse,
+    status_code=status.HTTP_200_OK,
+    description="Route to delete a politician by ID.",
+    tags=["politicians"],
+    summary="delete politician",
+    responses={
+        status.HTTP_200_OK: {
+            "model": Politician,
+            "description": "Ok Response",
+        },
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorResponse,
+            "description": "Politician not found",
+        },
+    },
+)
 async def delete_politician(item_id: str, es: Optional[Search] = Depends(get_es)):
-    """
-    Route to delete a politician by ID.
-
-    \f
-    Args:
-        item_id (str): ID of the politician.
-        es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
-
-    Returns:
-        dict: Confirmation message if successful.
-    """
     try:
         await es.delete(index="politicians", id=item_id)
         return {"message": f"Politician {item_id} has been deleted successfully"}
@@ -272,18 +303,25 @@ async def delete_politician(item_id: str, es: Optional[Search] = Depends(get_es)
         raise HTTPException(status_code=404, detail="Politician not found")
 
 
-@app.get("/statistics")
+@app.get(
+    "/statistics",
+    response_model=StatisticsResponse,
+    status_code=status.HTTP_200_OK,
+    description="Route to retrieve statistics about politicians salaries.",
+    tags=["politicians"],
+    summary="get statistics about politicians salaries",
+    responses={
+        status.HTTP_200_OK: {
+            "model": Politician,
+            "description": "Ok Response",
+        },
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorResponse,
+            "description": "Index not found",
+        },
+    },
+)
 async def get_statistics(es: Optional[Search] = Depends(get_es)):
-    """
-    Route to retrieve statistics about politicians' salaries.
-
-    \f
-    Args:
-        es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
-
-    Returns:
-        dict: Statistics including mean salary, median salary, and top salaries.
-    """
     es_query = {
         "query": {"match_all": {}},
         "size": 10,
@@ -312,4 +350,4 @@ async def get_statistics(es: Optional[Search] = Depends(get_es)):
             "top_salaries": extracted_hits,
         }
     except NotFoundError:
-        raise HTTPException(status_code=500, detail="Index not found")
+        raise HTTPException(status_code=404, detail="Index not found")

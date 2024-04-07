@@ -1,9 +1,11 @@
-from pydantic import BaseModel
+from typing import List
+from pydantic import BaseModel, field_validator
 
 from app.utils import partial_model
 
 
 class Politician(BaseModel):
+    _id: str
     nombre: str
     partido: str
     partido_para_filtro: str
@@ -25,3 +27,33 @@ class Politician(BaseModel):
 @partial_model
 class PoliticianUpdate(Politician):
     pass
+
+
+class ClusterStatusResponse(BaseModel):
+    cluster_name: str
+    status: str
+    timed_out: bool
+    number_of_nodes: int
+    number_of_data_nodes: int
+    active_primary_shards: int
+    active_shards: int
+    relocating_shards: int
+    delayed_unassigned_shards: int
+    number_of_pending_tasks: int
+    number_of_in_flight_fetch: int
+    task_max_waiting_in_queue_millis: int
+    active_shards_percent_as_number: float
+
+
+class MessageResponse(BaseModel):
+    message: str
+
+
+class StatisticsResponse(BaseModel):
+    mean_salary: float
+    median_salary: float
+    top_salaries: List[Politician]
+
+
+class ErrorResponse(BaseModel):
+    detail: str
