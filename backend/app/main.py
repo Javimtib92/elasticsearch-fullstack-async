@@ -44,11 +44,11 @@ app = FastAPI(lifespan=lifespan)
 
 # Set all CORS enabled origins
 if os.environ["BACKEND_CORS_ORIGINS"]:
+    origins = os.environ["BACKEND_CORS_ORIGINS"].split(",")
+    print(f"setting up cors: {origins}")
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[
-            str(origin).strip("/") for origin in os.environ["BACKEND_CORS_ORIGINS"]
-        ],
+        allow_origins=[str(origin).strip("/") for origin in origins],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
