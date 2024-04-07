@@ -179,20 +179,23 @@ async def get_all_politicians(
 
         query["bool"]["filter"]["terms"] = terms_filter
 
-    response = await es.search(
-        index="politicians",
-        body={
-            "query": query,
-            "from": (page - 1) * per_page,
-            "size": per_page,
-        },
-    )
+    try:
+        response = await es.search(
+            index="politicians",
+            body={
+                "query": query,
+                "from": (page - 1) * per_page,
+                "size": per_page,
+            },
+        )
 
-    hits = response["hits"]["hits"]
+        hits = response["hits"]["hits"]
 
-    extracted_hits = [{"_id": hit["_id"], **hit["_source"]} for hit in hits]
+        extracted_hits = [{"_id": hit["_id"], **hit["_source"]} for hit in hits]
 
-    return extracted_hits
+        return extracted_hits
+    except NotFoundError:
+        raise HTTPException(status_code=500, detail="Index not found")
 
 
 @app.get("/politicians/{id}")
@@ -284,17 +287,20 @@ async def get_statistics(es: Optional[Search] = Depends(get_es)):
         },
     }
 
-    response = await es.search(index="politicians", body=es_query)
-    hits = response["hits"]["hits"]
-    mean_salary = round(response["aggregations"]["mean_salary"]["value"], 2)
-    median_salary = round(
-        response["aggregations"]["median_salary"]["values"]["50.0"], 2
-    )
+    try:
+        response = await es.search(index="politicians", body=es_query)
+        hits = response["hits"]["hits"]
+        mean_salary = round(response["aggregations"]["mean_salary"]["value"], 2)
+        median_salary = round(
+            response["aggregations"]["median_salary"]["values"]["50.0"], 2
+        )
 
-    extracted_hits = [{"_id": hit["_id"], **hit["_source"]} for hit in hits]
+        extracted_hits = [{"_id": hit["_id"], **hit["_source"]} for hit in hits]
 
-    return {
-        "mean_salary": mean_salary,
-        "median_salary": median_salary,
-        "top_salaries": extracted_hits,
-    }
+        return {
+            "mean_salary": mean_salary,
+            "median_salary": median_salary,
+            "top_salaries": extracted_hits,
+        }
+    except NotFoundError:
+        raise HTTPException(status_code=500, detail="Index not found")
