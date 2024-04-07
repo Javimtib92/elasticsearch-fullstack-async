@@ -74,6 +74,9 @@ async def test_clear_index_endpoint_not_existent(client, mock_es):
     assert response.status_code == 404
 
 
+# FIXME:
+# Tests below are not working and I didn't have enough time to fix them or implement more tets
+
 # @pytest.mark.asyncio
 # @pytest.mark.parametrize("mock_es", [mock_es])
 # @patch("elasticsearch.helpers.async_streaming_bulk", AsyncMock(return_value=True))
