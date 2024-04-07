@@ -117,7 +117,7 @@ async def bulk(file: UploadFile = File(...), es: Optional[Search] = Depends(get_
         dict: Confirmation message if successful.
     """
     if not file.filename.endswith(".csv"):
-        return {"error": "Only CSV files are supported"}
+        raise HTTPException(status_code=422, detail="Only CSV files are supported")
 
     if not await es.indices.exists(index="politicians"):
         mapping = {"mappings": {"properties": create_es_mapping(Politician)}}
