@@ -47,8 +47,20 @@ services:
     stdin_open: true
     depends_on:
       - backend
-    
-      
+
+  frontend:
+    image: '${DOCKER_IMAGE_FRONTEND}:${TAG-latest}'
+    restart: always
+    networks:
+      - default
+    build:
+      context: ./frontend
+      args:
+        - VITE_API_URL=https://${DOMAIN}
+        - NODE_ENV=production
+    ports:
+      - "127.0.0.1:3000:3000"
+  
   elastic_setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
