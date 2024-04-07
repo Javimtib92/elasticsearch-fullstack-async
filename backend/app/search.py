@@ -9,7 +9,7 @@ from pydantic import BaseModel
 load_dotenv()
 
 
-class Search:
+class Search(AsyncElasticsearch):
     """
     Singleton class to handle Elasticsearch connection.
     """

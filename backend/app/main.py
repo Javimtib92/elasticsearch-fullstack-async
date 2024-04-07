@@ -39,6 +39,7 @@ async def index(es: Optional[Search] = Depends(get_es)):
     """
     Route to get the health of the Elasticsearch cluster.
 
+    \f
     Args:
         es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
 
@@ -55,6 +56,7 @@ async def clear_index_endpoint(
     """
     Route to clear all documents in a specified index.
 
+    \f
     Args:
         index_name (str): Name of the index to clear.
         es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
@@ -75,6 +77,7 @@ def csv_row_generator(upload_file):
     """
     Generator function to convert CSV rows into Elasticsearch actions.
 
+    \f
     Args:
         upload_file (UploadFile): Uploaded CSV file.
 
@@ -109,6 +112,7 @@ async def bulk(file: UploadFile = File(...), es: Optional[Search] = Depends(get_
     """
     Route to bulk upload politicians' data from a CSV file to Elasticsearch.
 
+    \f
     Args:
         file (UploadFile): Uploaded CSV file.
         es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
@@ -148,6 +152,7 @@ async def get_all_politicians(
     """
     Route to retrieve all politicians with optional filtering.
 
+    \f
     Args:
         page (int): Page number for pagination (default 1).
         per_page (int): Number of items per page (default 10, max 100).
@@ -203,6 +208,7 @@ async def get_politician_by_id(item_id: str, es: Optional[Search] = Depends(get_
     """
     Route to retrieve a politician by ID.
 
+    \f
     Args:
         item_id (str): ID of the politician.
         es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
@@ -227,6 +233,7 @@ async def update_politician(
     """
     Route to update a politician's information.
 
+    \f
     Args:
         item_id (str): ID of the politician.
         politician_update (PoliticianUpdate): Data to update.
@@ -249,6 +256,7 @@ async def delete_politician(item_id: str, es: Optional[Search] = Depends(get_es)
     """
     Route to delete a politician by ID.
 
+    \f
     Args:
         item_id (str): ID of the politician.
         es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
@@ -269,6 +277,7 @@ async def get_statistics(es: Optional[Search] = Depends(get_es)):
     """
     Route to retrieve statistics about politicians' salaries.
 
+    \f
     Args:
         es (Optional[Search]): Optional Elasticsearch connection. Default is obtained from `get_es` dependency.
 
