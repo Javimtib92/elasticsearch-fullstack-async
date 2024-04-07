@@ -9,7 +9,6 @@ from fastapi import Depends, FastAPI, File, HTTPException, Query, UploadFile, st
 from fastapi.encoders import jsonable_encoder
 
 from app.schemas import (
-    ClusterStatusResponse,
     ErrorResponse,
     MessageResponse,
     Politician,
@@ -44,14 +43,12 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get(
     "/",
-    response_model=ClusterStatusResponse,  # default response pydantic model
-    status_code=status.HTTP_200_OK,  # default status code
+    status_code=status.HTTP_200_OK,
     description="Route to get the health of the Elasticsearch cluster.",
     tags=["cluster"],
     summary="Get cluster health details",
     responses={
         status.HTTP_200_OK: {
-            "model": ClusterStatusResponse,
             "description": "Cluster details",
         },
     },

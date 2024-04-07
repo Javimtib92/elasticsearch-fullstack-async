@@ -52,22 +52,6 @@ class PoliticianEntry(Politician):
     id: str = Field(None, alias="_id")
 
 
-class ClusterStatusResponse(BaseModel):
-    cluster_name: str
-    status: str
-    timed_out: bool
-    number_of_nodes: int
-    number_of_data_nodes: int
-    active_primary_shards: int
-    active_shards: int
-    relocating_shards: int
-    delayed_unassigned_shards: int
-    number_of_pending_tasks: int
-    number_of_in_flight_fetch: int
-    task_max_waiting_in_queue_millis: int
-    active_shards_percent_as_number: float
-
-
 class MessageResponse(BaseModel):
     message: str
 
