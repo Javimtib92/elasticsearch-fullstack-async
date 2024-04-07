@@ -1,11 +1,12 @@
 from typing import List
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, Field
 
 from app.utils import partial_model
 
 
 class Politician(BaseModel):
-    nombre: str
+    # Comment for clarification, text_field defines a field that will be of type keyword AND text in elasticsearch
+    nombre: str = Field(..., text_field=True)
     partido: str
     partido_para_filtro: str
     genero: str
@@ -20,7 +21,7 @@ class Politician(BaseModel):
     trienios_sueldo: float
     retribucionmensual: float
     retribucionanual: float
-    observaciones: str
+    observaciones: str = Field(..., text_field=True)
 
     @field_validator(
         "sueldobase_sueldo",
@@ -47,6 +48,10 @@ class PoliticianUpdate(Politician):
     pass
 
 
+class PoliticianEntry(Politician):
+    id: str = Field(None, alias="_id")
+
+
 class ClusterStatusResponse(BaseModel):
     cluster_name: str
     status: str
@@ -70,7 +75,7 @@ class MessageResponse(BaseModel):
 class StatisticsResponse(BaseModel):
     mean_salary: float
     median_salary: float
-    top_salaries: List[Politician]
+    top_salaries: List[PoliticianEntry]
 
 
 class ErrorResponse(BaseModel):

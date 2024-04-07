@@ -13,6 +13,7 @@ from app.schemas import (
     ErrorResponse,
     MessageResponse,
     Politician,
+    PoliticianEntry,
     PoliticianUpdate,
     StatisticsResponse,
 )
@@ -154,14 +155,14 @@ async def bulk(file: UploadFile = File(...), es: Optional[Search] = Depends(get_
 
 @app.get(
     "/politicians",
-    response_model=List[Politician],
+    response_model=List[PoliticianEntry],
     status_code=status.HTTP_200_OK,
     description="Route to retrieve all politicians with optional filtering.",
     tags=["politicians"],
     summary="Get all politicians",
     responses={
         status.HTTP_200_OK: {
-            "model": List[Politician],
+            "model": List[PoliticianEntry],
             "description": "List of politicians",
         },
         status.HTTP_404_NOT_FOUND: {
@@ -219,14 +220,14 @@ async def get_all_politicians(
 
 @app.get(
     "/politicians/{id}",
-    response_model=Politician,
+    response_model=PoliticianEntry,
     status_code=status.HTTP_200_OK,
     description="Route to retrieve a politician by ID.",
     tags=["politicians"],
     summary="Get politician by id",
     responses={
         status.HTTP_200_OK: {
-            "model": Politician,
+            "model": PoliticianEntry,
             "description": "Ok Response",
         },
         status.HTTP_404_NOT_FOUND: {
@@ -253,7 +254,7 @@ async def get_politician_by_id(item_id: str, es: Optional[Search] = Depends(get_
     summary="update politician",
     responses={
         status.HTTP_200_OK: {
-            "model": Politician,
+            "model": MessageResponse,
             "description": "Ok Response",
         },
         status.HTTP_404_NOT_FOUND: {
@@ -285,7 +286,7 @@ async def update_politician(
     summary="delete politician",
     responses={
         status.HTTP_200_OK: {
-            "model": Politician,
+            "model": MessageResponse,
             "description": "Ok Response",
         },
         status.HTTP_404_NOT_FOUND: {
@@ -312,7 +313,7 @@ async def delete_politician(item_id: str, es: Optional[Search] = Depends(get_es)
     summary="get statistics about politicians salaries",
     responses={
         status.HTTP_200_OK: {
-            "model": Politician,
+            "model": StatisticsResponse,
             "description": "Ok Response",
         },
         status.HTTP_404_NOT_FOUND: {

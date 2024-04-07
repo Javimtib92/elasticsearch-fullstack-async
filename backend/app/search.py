@@ -61,17 +61,22 @@ def create_es_mapping(pydantic_model: BaseModel) -> Dict[str, str]:
         dict: Elasticsearch mapping.
     """
     mapping = {}
-    for field, field_type in pydantic_model.__annotations__.items():
-        es_field_type = type_map.get(field_type)
+
+    for field, field_info in pydantic_model.model_fields.items():
+        es_field_type = type_map.get(field_info.annotation)
         if not es_field_type:
-            if issubclass(field_type, BaseModel):
-                es_field_type = create_es_mapping(field_type)
+            if issubclass(field_info.annotation, BaseModel):
+                es_field_type = create_es_mapping(field_info.annotation)
             else:
                 es_field_type = {
                     "type": "nested",
-                    "properties": create_es_mapping(field_type.__args__[0]),
+                    "properties": create_es_mapping(field_info.annotation.__args__[0]),
                 }
-        if es_field_type == "keyword":
+
+        if (
+            field_info.json_schema_extra is not None
+            and field_info.json_schema_extra.get("text_field")
+        ):
             mapping[field] = {"type": "text", "fields": {"raw": {"type": "keyword"}}}
         else:
             mapping[field] = {"type": es_field_type}
