@@ -13,11 +13,11 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as PoliticiansImport } from './routes/politicians'
 
 // Create Virtual Routes
 
 const StatisticsLazyImport = createFileRoute('/statistics')()
-const PoliticiansLazyImport = createFileRoute('/politicians')()
 
 // Create/Update Routes
 
@@ -26,17 +26,17 @@ const StatisticsLazyRoute = StatisticsLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/statistics.lazy').then((d) => d.Route))
 
-const PoliticiansLazyRoute = PoliticiansLazyImport.update({
+const PoliticiansRoute = PoliticiansImport.update({
   path: '/politicians',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/politicians.lazy').then((d) => d.Route))
+} as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
     '/politicians': {
-      preLoaderRoute: typeof PoliticiansLazyImport
+      preLoaderRoute: typeof PoliticiansImport
       parentRoute: typeof rootRoute
     }
     '/statistics': {
@@ -49,7 +49,7 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export const routeTree = rootRoute.addChildren([
-  PoliticiansLazyRoute,
+  PoliticiansRoute,
   StatisticsLazyRoute,
 ])
 
