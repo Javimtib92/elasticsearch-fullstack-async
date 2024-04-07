@@ -17,8 +17,7 @@ services:
     restart: always
     networks:
       - default
-    env_file:
-      - .env
+    env_file: .env
     environment:
       - DOMAIN=${DOMAIN}
       - ENVIRONMENT=${ENVIRONMENT}
@@ -32,7 +31,24 @@ services:
 
     volumes:
       - certs:/usr/share/backend/config/certs
-
+  test:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile-test
+      args:
+        INSTALL_DEV: ${INSTALL_DEV-true}
+    env_file: .env.test
+    environment:
+      - DOMAIN=${DOMAIN}
+      - ENVIRONMENT=${ENVIRONMENT}
+    volumes:
+      - certs:/usr/share/backend/config/certs
+      - ./app/:/usr/src/app/
+    stdin_open: true
+    depends_on:
+      - backend
+    
+      
   elastic_setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:

@@ -3,4 +3,4 @@
 set -e
 set -x
 
-ruff format app --check
+ruff format app --check 

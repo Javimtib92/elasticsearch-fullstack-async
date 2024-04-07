@@ -9,14 +9,24 @@ readme = "README.md"
 python = "^3.11"
 fastapi = "^0.110.1"
 uvicorn = { extras = ["standard"], version = "^0.29.0" }
-elasticsearch = {extras = ["async"], version = "^8.13.0"}
+elasticsearch = { extras = ["async"], version = "^8.13.0" }
 python-multipart = "^0.0.9"
+
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.3.5"
+pytest = "^8.1.1"
+pytest-asyncio = "^0.23.6"
+pytest-elasticsearch = "^4.1.0"
+pytest-mock = "^3.14.0"
+httpx = "^0.27.0"
 
 [tool.ruff]
 target-version = "py311"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+elasticsearch_cluster_name = "test_cluster"
 
 [build-system]
 requires = ["poetry-core"]
