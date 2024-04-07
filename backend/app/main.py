@@ -1,3 +1,4 @@
+import os
 import csv
 import io
 from contextlib import asynccontextmanager
@@ -7,6 +8,7 @@ from elasticsearch import AsyncElasticsearch, NotFoundError
 from elasticsearch.helpers import async_streaming_bulk
 from fastapi import Depends, FastAPI, File, HTTPException, Query, UploadFile, status
 from fastapi.encoders import jsonable_encoder
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.schemas import (
     ErrorResponse,
@@ -39,6 +41,18 @@ async def lifespan(_: FastAPI, es: Optional[Search] = Depends(get_es)):
 
 
 app = FastAPI(lifespan=lifespan)
+
+# Set all CORS enabled origins
+if os.environ["BACKEND_CORS_ORIGINS"]:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[
+            str(origin).strip("/") for origin in os.environ["BACKEND_CORS_ORIGINS"]
+        ],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 
 @app.get(
