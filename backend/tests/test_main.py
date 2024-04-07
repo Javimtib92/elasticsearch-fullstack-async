@@ -1,7 +1,5 @@
-import io
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock
 
-from elasticsearch import AsyncElasticsearch
 import pytest
 from httpx import ASGITransport, AsyncClient
 
