@@ -71,5 +71,8 @@ def create_es_mapping(pydantic_model: BaseModel) -> Dict[str, str]:
                     "type": "nested",
                     "properties": create_es_mapping(field_type.__args__[0]),
                 }
-        mapping[field] = {"type": es_field_type}
+        if es_field_type == "keyword":
+            mapping[field] = {"type": "text", "fields": {"raw": {"type": "keyword"}}}
+        else:
+            mapping[field] = {"type": es_field_type}
     return mapping

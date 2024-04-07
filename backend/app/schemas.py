@@ -5,7 +5,6 @@ from app.utils import partial_model
 
 
 class Politician(BaseModel):
-    _id: str
     nombre: str
     partido: str
     partido_para_filtro: str
