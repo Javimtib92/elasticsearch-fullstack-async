@@ -1,4 +1,5 @@
 import { MainNav } from "@/components/main-nav";
+import { MobileNav } from "@/components/mobile-nav";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 
@@ -11,6 +12,9 @@ export const Route = createRootRoute({
             <MainNav className="mx-6" />
           </div>
         </div>
+      </div>
+      <div className="flex flex-col items-end">
+        <MobileNav />
       </div>
       <Outlet />
       <TanStackRouterDevtools />

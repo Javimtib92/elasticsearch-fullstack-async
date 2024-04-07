@@ -16,17 +16,19 @@ export function MainNav({
     >
       <Link
         to="/politicians"
-        className={`text-sm font-medium transition-colors hover:text-primary ${
-          location.pathname !== "/politicians" && inactive
-        }`}
+        className={cn(
+          "text-sm font-medium transition-colors hover:text-primary",
+          location.pathname !== "/politicians" && inactive,
+        )}
       >
         Politicians
       </Link>
       <Link
         to="/statistics"
-        className={`text-sm font-medium transition-colors hover:text-primary ${
-          location.pathname !== "/statistics" && inactive
-        }`}
+        className={cn(
+          "text-sm font-medium transition-colors hover:text-primary",
+          location.pathname !== "/statistics" && inactive,
+        )}
       >
         Statistics
       </Link>
