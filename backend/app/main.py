@@ -175,7 +175,7 @@ async def get_all_politicians(
     per_page: int = Query(10, le=100),
     name: str = None,
     party: str = None,
-    political_occupation: str = None,
+    gender: str = None,
     es: Optional[Search] = Depends(get_es),
 ):
     query = {"bool": {"must": []}}
@@ -185,16 +185,16 @@ async def get_all_politicians(
             {"match": {"nombre": {"query": name, "fuzziness": "auto"}}}
         )
 
-    if party or political_occupation:
+    if party or gender:
         query["bool"]["filter"] = {}
 
         terms_filter = {}
         if party:
             party_list = party.split(",")
-            terms_filter["partido_para_filtro"] = party_list
-        if political_occupation:
-            political_occupation_list = political_occupation.split(",")
-            terms_filter["cargo_para_filtro"] = political_occupation_list
+            terms_filter["partido"] = party_list
+        if gender:
+            gender_list = gender.split(",")
+            terms_filter["genero"] = gender_list
 
         query["bool"]["filter"]["terms"] = terms_filter
 
@@ -349,5 +349,71 @@ async def get_statistics(es: Optional[Search] = Depends(get_es)):
             "median_salary": median_salary,
             "top_salaries": extracted_hits,
         }
+    except NotFoundError:
+        raise HTTPException(status_code=404, detail="Index not found")
+
+
+@app.get(
+    "/available_genders",
+    response_model=List[str],
+    status_code=status.HTTP_200_OK,
+    description="Route to retrieve a list of all available genders.",
+    tags=["politicians_metadata"],
+    summary="Get all available genders",
+    responses={
+        status.HTTP_200_OK: {
+            "description": "List of available genders",
+        },
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorResponse,
+            "description": "Index not found",
+        },
+    },
+)
+async def get_available_genders(es: Optional[Search] = Depends(get_es)):
+    try:
+        response = await es.search(
+            index="politicians",
+            body={
+                "size": 0,
+                "aggs": {"available_genders": {"terms": {"field": "genero"}}},
+            },
+        )
+        buckets = response["aggregations"]["available_genders"]["buckets"]
+        available_genders = [bucket["key"] for bucket in buckets]
+        return available_genders
+    except NotFoundError:
+        raise HTTPException(status_code=404, detail="Index not found")
+
+
+@app.get(
+    "/available_parties",
+    response_model=List[str],
+    status_code=status.HTTP_200_OK,
+    description="Route to retrieve a list of all available parties.",
+    tags=["politicians_metadata"],
+    summary="Get all available parties",
+    responses={
+        status.HTTP_200_OK: {
+            "description": "List of available parties",
+        },
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorResponse,
+            "description": "Index not found",
+        },
+    },
+)
+async def get_available_parties(es: Optional[Search] = Depends(get_es)):
+    try:
+        response = await es.search(
+            index="politicians",
+            body={
+                "size": 0,
+                "aggs": {"available_parties": {"terms": {"field": "partido"}}},
+            },
+        )
+        buckets = response["aggregations"]["available_parties"]["buckets"]
+        available_parties = [bucket["key"] for bucket in buckets]
+        return available_parties
     except NotFoundError:
         raise HTTPException(status_code=404, detail="Index not found")
