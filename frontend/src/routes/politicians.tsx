@@ -46,7 +46,7 @@ function PoliticiansPage() {
   });
 
   useEffect(() => {
-    if (page !== pagination.pageIndex + 1) {
+    if (page !== pagination.pageIndex + 1 || perPage !== pagination.pageSize) {
       navigate({
         to: "/politicians",
         search: {
