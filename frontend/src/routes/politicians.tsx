@@ -5,14 +5,19 @@ import { politiciansQueryOptions } from "@/react-query/politicians-query";
 import type { PoliticiansSearch } from "@/types/politicians";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
+
+const PoliticiansSearchSchema = z.object({
+  page: z.number().optional(),
+  perPage: z.number().optional(),
+  filter: z.string().optional(),
+});
 
 export const Route = createFileRoute("/politicians")({
   validateSearch: (search: Record<string, unknown>): PoliticiansSearch => {
-    return {
-      page: Number(search?.page ?? 1),
-      perPage: Number(search?.perPage ?? 10),
-      filter: (search.filter as string) || "",
-    };
+    const validatedSearch = PoliticiansSearchSchema.parse(search);
+
+    return validatedSearch;
   },
   loaderDeps: ({ search: { page, perPage } }) => ({ page, perPage }),
   loader: ({ context: { queryClient }, deps: { page, perPage } }) =>

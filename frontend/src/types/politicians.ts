@@ -19,8 +19,8 @@ export type Politician = {
 };
 
 export type PoliticiansSearch = {
-  page: number;
-  perPage: number;
+  page?: number;
+  perPage?: number;
   filter?: string;
 };
 export type GetAllPoliticiansSearchParams = {

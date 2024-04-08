@@ -18,6 +18,11 @@ export function MainNav({
     >
       <Link
         to="/politicians"
+        search={{
+          page: 1,
+          perPage: 10,
+          filter: "",
+        }}
         className={cn(
           "text-sm font-medium transition-colors hover:text-primary",
           location.pathname !== "/politicians" && inactive,
