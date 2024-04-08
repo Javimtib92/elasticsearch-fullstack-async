@@ -254,9 +254,9 @@ async def get_all_politicians(
         },
     },
 )
-async def get_politician_by_id(item_id: str, es: Optional[Search] = Depends(get_es)):
+async def get_politician_by_id(id: str, es: Optional[Search] = Depends(get_es)):
     try:
-        result = await es.get(index="politicians", id=item_id)
+        result = await es.get(index="politicians", id=id)
         return {"_id": result["_id"], **result["_source"]}
 
     except NotFoundError:
@@ -282,14 +282,14 @@ async def get_politician_by_id(item_id: str, es: Optional[Search] = Depends(get_
     },
 )
 async def update_politician(
-    item_id: str,
+    id: str,
     politician_update: PoliticianUpdate,
     es: Optional[Search] = Depends(get_es),
 ):
     try:
         update_item_encoded = jsonable_encoder(politician_update)
-        await es.update(index="politicians", id=item_id, doc=update_item_encoded)
-        return {"message": f"Politician {item_id} has been updated successfully"}
+        await es.update(index="politicians", id=id, doc=update_item_encoded)
+        return {"message": f"Politician {id} has been updated successfully"}
 
     except NotFoundError:
         raise HTTPException(status_code=404, detail="Politician not found")
@@ -313,10 +313,10 @@ async def update_politician(
         },
     },
 )
-async def delete_politician(item_id: str, es: Optional[Search] = Depends(get_es)):
+async def delete_politician(id: str, es: Optional[Search] = Depends(get_es)):
     try:
-        await es.delete(index="politicians", id=item_id)
-        return {"message": f"Politician {item_id} has been deleted successfully"}
+        await es.delete(index="politicians", id=id)
+        return {"message": f"Politician {id} has been deleted successfully"}
 
     except NotFoundError:
         raise HTTPException(status_code=404, detail="Politician not found")
