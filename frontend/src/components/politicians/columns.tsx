@@ -1,29 +1,11 @@
 "use client";
 
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, Row } from "@tanstack/react-table";
 
-export type Politician = {
-  nombre: string;
-  partido: string;
-  partido_para_filtro: string;
-  genero: string;
-  cargo_para_filtro: string;
-  cargo: string;
-  institucion: string;
-  ccaa: string;
-  sueldobase_sueldo: number;
-  complementos_sueldo: number;
-  pagasextra_sueldo: number;
-  otrasdietaseindemnizaciones_sueldo: number;
-  trienios_sueldo: number;
-  retribucionmensual: number;
-  retribucionanual: number;
-  observaciones: string;
-  _id: string;
-};
+import type { Politician } from "@/types/politicians";
 
 function toCurrencyCell(field: keyof Politician) {
-  return ({ row }) => {
+  return ({ row }: { row: Row<Politician> }) => {
     const sueldoBase = Number.parseFloat(row.getValue(field));
     const formatted = new Intl.NumberFormat("es-ES", {
       style: "currency",

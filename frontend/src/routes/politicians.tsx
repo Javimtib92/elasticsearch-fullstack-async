@@ -1,26 +1,29 @@
-import { type Politician, columns } from "@/components/politicians/columns";
+import { columns } from "@/components/politicians/columns";
 import { DataTable } from "@/components/politicians/data-table";
+import { politicianService } from "@/services/politiciansService";
+import type { Politician, PoliticiansSearch } from "@/types/politicians";
 import { createFileRoute } from "@tanstack/react-router";
 
 async function getData({
-  offset,
-  limit,
-}: { offset: number; limit: number }): Promise<Politician[]> {
-  const page = Math.ceil((offset + 1) / limit); // Calculate page number
-  const perPage = limit;
+  page,
+  perPage,
+}: { page: number; perPage: number }): Promise<Politician[]> {
+  const response = await politicianService.getPoliticians({ page, perPage });
 
-  const response = await fetch(
-    `http://localhost:8080/politicians?page=${page}&per_page=${perPage}`,
-  );
-  const data = await response.json();
-
-  return data;
+  return response;
 }
 
 export const Route = createFileRoute("/politicians")({
-  loaderDeps: ({ search: { offset, limit } }) => ({ offset, limit }),
-  loader: async ({ deps: { offset = 0, limit = 10 } }) => {
-    const data = await getData({ offset, limit });
+  validateSearch: (search: Record<string, unknown>): PoliticiansSearch => {
+    return {
+      page: Number(search?.page ?? 1),
+      perPage: Number(search?.perPage ?? 10),
+      filter: (search.filter as string) || "",
+    };
+  },
+  loaderDeps: ({ search: { page, perPage } }) => ({ page, perPage }),
+  loader: async ({ deps: { page, perPage } }) => {
+    const data = await getData({ page, perPage });
     return {
       data,
     };
