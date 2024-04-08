@@ -28,7 +28,7 @@ class PoliticianService {
 
   async getPoliticians(
     params?: GetAllPoliticiansSearchParams,
-  ): Promise<Politician[]> {
+  ): Promise<{ data: Politician[]; total_pages: number }> {
     let url = `${this.baseUrl}/politicians`;
 
     if (params) {

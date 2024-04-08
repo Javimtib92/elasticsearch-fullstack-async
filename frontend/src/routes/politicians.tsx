@@ -2,10 +2,13 @@ import { columns } from "@/components/politicians/columns";
 import { DataTable } from "@/components/politicians/data-table";
 import { EmptyResults } from "@/components/politicians/empty-results";
 import { politiciansQueryOptions } from "@/react-query/politicians-query";
-import type { PoliticiansSearch } from "@/types/politicians";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { z } from "zod";
+
+import type { PoliticiansSearch } from "@/types/politicians";
+import type { PaginationState } from "@tanstack/react-table";
 
 const PoliticiansSearchSchema = z.object({
   page: z.number().optional(),
@@ -29,15 +32,42 @@ export const Route = createFileRoute("/politicians")({
 });
 
 function PoliticiansPage() {
+  const navigate = useNavigate();
   const { page, perPage } = Route.useSearch();
   const politiciansQuery = useSuspenseQuery(
     politiciansQueryOptions(page, perPage),
   );
-  const data = politiciansQuery.data;
+  const politicians = politiciansQuery.data.politicians;
+  const totalPages = politiciansQuery.data.meta.totalPages;
+
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: (page || 1) - 1,
+    pageSize: perPage || 10,
+  });
+
+  useEffect(() => {
+    if (page !== pagination.pageIndex + 1) {
+      navigate({
+        to: "/politicians",
+        search: {
+          page: pagination.pageIndex + 1,
+          perPage: pagination.pageSize,
+          filter: undefined,
+        },
+      });
+    }
+  }, [navigate, page, pagination]);
 
   return (
     <div className="container mx-auto py-10">
-      <DataTable columns={columns} data={data} />
+      <DataTable
+        columns={columns}
+        data={politicians}
+        pageIndex={pagination.pageIndex}
+        pageSize={pagination.pageSize}
+        totalPages={totalPages}
+        onPaginationChange={setPagination}
+      />
     </div>
   );
 }

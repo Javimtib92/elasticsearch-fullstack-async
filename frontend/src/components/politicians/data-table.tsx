@@ -2,6 +2,8 @@
 
 import {
   type ColumnDef,
+  type OnChangeFn,
+  type PaginationState,
   flexRender,
   getCoreRowModel,
   useReactTable,
@@ -15,21 +17,39 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DataTablePagination } from "./data-table-pagination";
 import { EmptyResults } from "./empty-results";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  pageIndex?: number;
+  pageSize?: number;
+  totalPages?: number;
+  onPaginationChange: OnChangeFn<PaginationState>;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  pageIndex = 0,
+  pageSize = 10,
+  totalPages = 0,
+  onPaginationChange,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    rowCount: totalPages * pageSize,
+    state: {
+      pagination: {
+        pageIndex,
+        pageSize,
+      },
+    },
+    manualPagination: true,
+    onPaginationChange,
   });
 
   if (table.getRowModel().rows?.length === 0) {
@@ -72,6 +92,7 @@ export function DataTable<TData, TValue>({
           ))}
         </TableBody>
       </Table>
+      <DataTablePagination table={table} />
     </div>
   );
 }
