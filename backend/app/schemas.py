@@ -52,6 +52,11 @@ class PoliticianEntry(Politician):
     id: str = Field(None, alias="_id")
 
 
+class PoliticiansPaginated(BaseModel):
+    data: List[PoliticianEntry]
+    total_pages: int
+
+
 class MessageResponse(BaseModel):
     message: str
 

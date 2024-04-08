@@ -1,3 +1,4 @@
+from math import ceil
 import os
 import csv
 import io
@@ -16,6 +17,7 @@ from app.schemas import (
     Politician,
     PoliticianEntry,
     PoliticianUpdate,
+    PoliticiansPaginated,
     StatisticsResponse,
 )
 from app.search import Search, create_es_mapping, get_es
@@ -166,14 +168,14 @@ async def bulk(file: UploadFile = File(...), es: Optional[Search] = Depends(get_
 
 @app.get(
     "/politicians",
-    response_model=List[PoliticianEntry],
+    response_model=PoliticiansPaginated,
     status_code=status.HTTP_200_OK,
     description="Route to retrieve all politicians with optional filtering.",
     tags=["politicians"],
     summary="Get all politicians",
     responses={
         status.HTTP_200_OK: {
-            "model": List[PoliticianEntry],
+            "model": PoliticiansPaginated,
             "description": "List of politicians",
         },
         status.HTTP_404_NOT_FOUND: {
@@ -222,9 +224,14 @@ async def get_all_politicians(
 
         hits = response["hits"]["hits"]
 
+        total_hits = response["hits"]["total"]["value"]
+
+        # Calculate total count of pages
+        total_pages = ceil(total_hits / per_page)
+
         extracted_hits = [{"_id": hit["_id"], **hit["_source"]} for hit in hits]
 
-        return extracted_hits
+        return {"data": extracted_hits, "total_pages": total_pages}
     except NotFoundError:
         raise HTTPException(status_code=404, detail="Index not found")
 
