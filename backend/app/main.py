@@ -163,6 +163,8 @@ async def bulk(file: UploadFile = File(...), es: Optional[Search] = Depends(get_
         if not ok:
             print("failed to %s document %s" % (action, result["_id"]))
 
+    await es.indices.refresh(index="politicians")
+
     return {"message": "success"}
 
 
@@ -288,7 +290,9 @@ async def update_politician(
 ):
     try:
         update_item_encoded = jsonable_encoder(politician_update)
-        await es.update(index="politicians", id=id, doc=update_item_encoded)
+        await es.update(
+            index="politicians", id=id, doc=update_item_encoded, refresh="wait_for"
+        )
         return {"message": f"Politician {id} has been updated successfully"}
 
     except NotFoundError:
@@ -315,7 +319,7 @@ async def update_politician(
 )
 async def delete_politician(id: str, es: Optional[Search] = Depends(get_es)):
     try:
-        await es.delete(index="politicians", id=id)
+        await es.delete(index="politicians", id=id, refresh="wait_for")
         return {"message": f"Politician {id} has been deleted successfully"}
 
     except NotFoundError:
