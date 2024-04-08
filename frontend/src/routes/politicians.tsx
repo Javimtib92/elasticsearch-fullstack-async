@@ -1,6 +1,7 @@
 import { columns } from "@/components/politicians/columns";
 import { DataTable } from "@/components/politicians/data-table";
-import { politicianService } from "@/services/politiciansService";
+import { EmptyResults } from "@/components/politicians/empty-results";
+import { politicianService } from "@/services/politicians-service";
 import type { Politician, PoliticiansSearch } from "@/types/politicians";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -29,8 +30,8 @@ export const Route = createFileRoute("/politicians")({
     };
   },
   component: PoliticiansPage,
-  errorComponent: ({ error, reset }) => {
-    return <div>Error</div>;
+  errorComponent: (_) => {
+    return <EmptyResults/>
   },
 });
 

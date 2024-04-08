@@ -18,6 +18,23 @@ function toCurrencyCell(field: keyof Politician) {
 
 export const columns: ColumnDef<Politician>[] = [
   {
+    id: 'image',
+    cell: (_) => {
+      return (
+        <div className="w-8 h-8">
+          <img
+            alt="Politician"
+            className="aspect-square rounded-md object-cover"
+            height="32"
+            src="https://placehold.co/32x32"
+            width="32"
+          />
+        </div>
+       
+      )
+    },
+  },
+  {
     accessorKey: "nombre",
     header: "Nombre",
   },
