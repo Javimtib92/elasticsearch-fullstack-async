@@ -10,6 +10,22 @@ class PoliticianService {
     this.baseUrl = baseUrl || "http://localhost:8080";
   }
 
+  async bulkUpload(file: File): Promise<{ message: string }> {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch(`${this.baseUrl}/bulk`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to perform bulk upload");
+    }
+
+    return await response.json();
+  }
+
   async getPoliticians(
     params?: GetAllPoliticiansSearchParams,
   ): Promise<Politician[]> {

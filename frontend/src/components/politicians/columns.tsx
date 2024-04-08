@@ -18,7 +18,7 @@ function toCurrencyCell(field: keyof Politician) {
 
 export const columns: ColumnDef<Politician>[] = [
   {
-    id: 'image',
+    id: "image",
     cell: (_) => {
       return (
         <div className="w-8 h-8">
@@ -30,8 +30,7 @@ export const columns: ColumnDef<Politician>[] = [
             width="32"
           />
         </div>
-       
-      )
+      );
     },
   },
   {

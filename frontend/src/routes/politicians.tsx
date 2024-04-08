@@ -31,7 +31,7 @@ export const Route = createFileRoute("/politicians")({
   },
   component: PoliticiansPage,
   errorComponent: (_) => {
-    return <EmptyResults/>
+    return <EmptyResults />;
   },
 });
 
