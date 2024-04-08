@@ -6,8 +6,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-
 import { useDebounceCallback } from "@/hooks/useDebounceCallback";
+
 import type { PoliticiansSearch } from "@/types/politicians";
 import type { PaginationState } from "@tanstack/react-table";
 
@@ -60,7 +60,7 @@ function PoliticiansPage() {
       search: {
         page: 1,
         perPage: 10,
-        name: term || undefined,
+        name: term || undefined, // default to undefined because I want empty strings to be undefined so that we avoid the query param to be present
       },
       replace: true,
     });
@@ -73,7 +73,7 @@ function PoliticiansPage() {
         search: {
           page: pagination.pageIndex + 1,
           perPage: pagination.pageSize,
-          name: search,
+          name: search || undefined, // default to undefined because I want empty strings to be undefined so that we avoid the query param to be present
         },
       });
     }
