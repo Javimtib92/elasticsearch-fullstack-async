@@ -61,7 +61,7 @@ class PoliticianService {
   }
 
   async updatePolitician(
-    id: number,
+    id: string,
     newData: Politician,
   ): Promise<{ message: string }> {
     const response = await fetch(`${this.baseUrl}/politicians/${id}`, {

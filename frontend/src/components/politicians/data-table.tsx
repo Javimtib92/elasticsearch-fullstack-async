@@ -28,6 +28,7 @@ interface DataTableProps<TData, TValue> {
   pageIndex?: number;
   pageSize?: number;
   totalPages?: number;
+  initialSearch: string;
   onPaginationChange: OnChangeFn<PaginationState>;
   onSearchChange: (term: string) => void;
 }
@@ -38,6 +39,7 @@ export function DataTable<TData, TValue>({
   pageIndex = 0,
   pageSize = 10,
   totalPages = 0,
+  initialSearch,
   onPaginationChange,
   onSearchChange,
 }: DataTableProps<TData, TValue>) {
@@ -69,6 +71,7 @@ export function DataTable<TData, TValue>({
             className="w-full bg-white shadow-none appearance-none pl-8 md:w-2/3 lg:w-1/3 dark:bg-gray-950"
             placeholder="Search politicians..."
             type="search"
+            defaultValue={initialSearch}
             onChange={onSearchInputChange}
           />
         </div>

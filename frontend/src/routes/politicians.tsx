@@ -1,12 +1,12 @@
 import { columns } from "@/components/politicians/columns";
 import { DataTable } from "@/components/politicians/data-table";
 import { EmptyResults } from "@/components/politicians/empty-results";
+import { useDebounceCallback } from "@/hooks/useDebounceCallback";
 import { politiciansQueryOptions } from "@/react-query/politicians-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { useDebounceCallback } from "@/hooks/useDebounceCallback";
 
 import type { PoliticiansSearch } from "@/types/politicians";
 import type { PaginationState } from "@tanstack/react-table";
@@ -87,6 +87,7 @@ function PoliticiansPage() {
         pageIndex={pagination.pageIndex}
         pageSize={pagination.pageSize}
         totalPages={totalPages}
+        initialSearch={name}
         onSearchChange={onSearchChange}
         onPaginationChange={setPagination}
       />
