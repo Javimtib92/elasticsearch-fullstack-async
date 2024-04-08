@@ -16,6 +16,9 @@ function toCurrencyCell(field: keyof Politician) {
   };
 }
 
+/**
+ * I choosed not to show all data because there's a lot of columns and for demo purposes I'll keep it simple
+ */
 export const columns: ColumnDef<Politician>[] = [
   {
     id: "image",
@@ -42,47 +45,12 @@ export const columns: ColumnDef<Politician>[] = [
     header: "Partido",
   },
   {
-    accessorKey: "genero",
-    header: "Género",
-  },
-  {
     accessorKey: "cargo",
     header: "Cargo",
   },
   {
-    accessorKey: "institucion",
-    header: "Institución",
-  },
-  {
     accessorKey: "ccaa",
     header: "CCAA",
-  },
-  {
-    accessorKey: "sueldobase_sueldo",
-    header: () => <div className="text-right">Sueldo Base</div>,
-    cell: toCurrencyCell("sueldobase_sueldo"),
-  },
-  {
-    accessorKey: "complementos_sueldo",
-    header: () => <div className="text-right">Complementos Sueldo</div>,
-    cell: toCurrencyCell("complementos_sueldo"),
-  },
-  {
-    accessorKey: "pagasextra_sueldo",
-    header: () => <div className="text-right">Pagas Extra Sueldo</div>,
-    cell: toCurrencyCell("pagasextra_sueldo"),
-  },
-  {
-    accessorKey: "otrasdietaseindemnizaciones_sueldo",
-    header: () => (
-      <div className="text-right">Otras Dietas e Indemnizaciones Sueldo</div>
-    ),
-    cell: toCurrencyCell("otrasdietaseindemnizaciones_sueldo"),
-  },
-  {
-    accessorKey: "trienios_sueldo",
-    header: () => <div className="text-right">Trienios Sueldo</div>,
-    cell: toCurrencyCell("trienios_sueldo"),
   },
   {
     accessorKey: "retribucionmensual",

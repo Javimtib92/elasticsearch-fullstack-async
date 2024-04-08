@@ -2,12 +2,6 @@ import { MainNav } from "@/components/main-nav";
 import { MobileNav } from "@/components/mobile-nav";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import {
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query'
-
-const queryClient = new QueryClient()
 
 export const Route = createRootRoute({
   component: () => (
@@ -22,10 +16,8 @@ export const Route = createRootRoute({
       <div className="flex flex-col items-end">
         <MobileNav />
       </div>
-      <QueryClientProvider client={queryClient}>
-        <Outlet />
-      </QueryClientProvider>
-     
+      <Outlet />
+
       <TanStackRouterDevtools />
     </>
   ),
