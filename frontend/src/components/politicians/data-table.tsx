@@ -9,6 +9,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -17,8 +18,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { SearchIcon } from "lucide-react";
+import type { ChangeEventHandler } from "react";
 import { DataTablePagination } from "./data-table-pagination";
-import { EmptyResults } from "./empty-results";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -27,6 +29,7 @@ interface DataTableProps<TData, TValue> {
   pageSize?: number;
   totalPages?: number;
   onPaginationChange: OnChangeFn<PaginationState>;
+  onSearchChange: (term: string) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -36,6 +39,7 @@ export function DataTable<TData, TValue>({
   pageSize = 10,
   totalPages = 0,
   onPaginationChange,
+  onSearchChange,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -52,12 +56,23 @@ export function DataTable<TData, TValue>({
     onPaginationChange,
   });
 
-  if (table.getRowModel().rows?.length === 0) {
-    return <EmptyResults />;
-  }
+  const onSearchInputChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+    onSearchChange(event?.target.value);
+  };
 
   return (
     <div className="rounded-md border shadow-sm">
+      <div className="p-4">
+        <div className="relative">
+          <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500 dark:text-gray-400" />
+          <Input
+            className="w-full bg-white shadow-none appearance-none pl-8 md:w-2/3 lg:w-1/3 dark:bg-gray-950"
+            placeholder="Search politicians..."
+            type="search"
+            onChange={onSearchInputChange}
+          />
+        </div>
+      </div>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -78,18 +93,26 @@ export function DataTable<TData, TValue>({
           ))}
         </TableHeader>
         <TableBody>
-          {table.getRowModel().rows.map((row) => (
-            <TableRow
-              key={row.id}
-              data-state={row.getIsSelected() && "selected"}
-            >
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                No results.
+              </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
       <DataTablePagination table={table} />

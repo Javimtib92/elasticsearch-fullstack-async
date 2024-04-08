@@ -7,13 +7,14 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 
+import { useDebounceCallback } from "@/hooks/useDebounceCallback";
 import type { PoliticiansSearch } from "@/types/politicians";
 import type { PaginationState } from "@tanstack/react-table";
 
 const PoliticiansSearchSchema = z.object({
   page: z.number().optional(),
   perPage: z.number().optional(),
-  filter: z.string().optional(),
+  name: z.string().optional(),
 });
 
 export const Route = createFileRoute("/politicians")({
@@ -22,9 +23,13 @@ export const Route = createFileRoute("/politicians")({
 
     return validatedSearch;
   },
-  loaderDeps: ({ search: { page, perPage } }) => ({ page, perPage }),
-  loader: ({ context: { queryClient }, deps: { page, perPage } }) =>
-    queryClient.ensureQueryData(politiciansQueryOptions(page, perPage)),
+  loaderDeps: ({ search: { page, perPage, name } }) => ({
+    page,
+    perPage,
+    name,
+  }),
+  loader: ({ context: { queryClient }, deps: { page, perPage, name } }) =>
+    queryClient.ensureQueryData(politiciansQueryOptions(page, perPage, name)),
   component: PoliticiansPage,
   errorComponent: (_) => {
     return <EmptyResults />;
@@ -33,17 +38,33 @@ export const Route = createFileRoute("/politicians")({
 
 function PoliticiansPage() {
   const navigate = useNavigate();
-  const { page, perPage } = Route.useSearch();
+  const { page, perPage, name } = Route.useSearch();
   const politiciansQuery = useSuspenseQuery(
-    politiciansQueryOptions(page, perPage),
+    politiciansQueryOptions(page, perPage, name),
   );
   const politicians = politiciansQuery.data.politicians;
   const totalPages = politiciansQuery.data.meta.totalPages;
 
+  const [search, setSearch] = useState<string | undefined>(name);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: (page || 1) - 1,
     pageSize: perPage || 10,
   });
+
+  const onSearchChange = useDebounceCallback((term: string) => {
+    setPagination(() => ({ pageIndex: 0, pageSize: 10 }));
+    setSearch(term);
+
+    navigate({
+      to: "/politicians",
+      search: {
+        page: 1,
+        perPage: 10,
+        name: term || undefined,
+      },
+      replace: true,
+    });
+  }, 300);
 
   useEffect(() => {
     if (page !== pagination.pageIndex + 1 || perPage !== pagination.pageSize) {
@@ -52,11 +73,11 @@ function PoliticiansPage() {
         search: {
           page: pagination.pageIndex + 1,
           perPage: pagination.pageSize,
-          filter: undefined,
+          name: search,
         },
       });
     }
-  }, [navigate, page, perPage, pagination]);
+  }, [navigate, page, perPage, pagination, search]);
 
   return (
     <div className="container mx-auto py-10">
@@ -66,6 +87,7 @@ function PoliticiansPage() {
         pageIndex={pagination.pageIndex}
         pageSize={pagination.pageSize}
         totalPages={totalPages}
+        onSearchChange={onSearchChange}
         onPaginationChange={setPagination}
       />
     </div>

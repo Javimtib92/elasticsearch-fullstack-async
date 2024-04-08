@@ -5,11 +5,16 @@ import { queryOptions } from "@tanstack/react-query";
 async function getData({
   page,
   perPage,
-}: { page?: number; perPage?: number }): Promise<{
+  name,
+}: { page?: number; perPage?: number; name?: string }): Promise<{
   politicians: Politician[];
   meta: { totalPages: number };
 }> {
-  const response = await politicianService.getPoliticians({ page, perPage });
+  const response = await politicianService.getPoliticians({
+    page,
+    perPage,
+    name,
+  });
 
   return {
     politicians: response.data,
@@ -19,8 +24,12 @@ async function getData({
   };
 }
 
-export const politiciansQueryOptions = (page?: number, perPage?: number) =>
+export const politiciansQueryOptions = (
+  page?: number,
+  perPage?: number,
+  name?: string,
+) =>
   queryOptions({
-    queryKey: ["politicians", { page, perPage }],
-    queryFn: () => getData({ page, perPage }),
+    queryKey: ["politicians", { page, perPage, name }],
+    queryFn: () => getData({ page, perPage, name }),
   });
