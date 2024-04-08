@@ -77,7 +77,7 @@ class PoliticianService {
     return await response.json();
   }
 
-  async deletePolitician(id: number): Promise<{ message: string }> {
+  async deletePolitician(id: string): Promise<{ message: string }> {
     const response = await fetch(`${this.baseUrl}/politicians/${id}`, {
       method: "DELETE",
     });

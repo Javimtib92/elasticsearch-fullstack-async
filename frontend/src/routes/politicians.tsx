@@ -56,7 +56,7 @@ function PoliticiansPage() {
         },
       });
     }
-  }, [navigate, page, pagination]);
+  }, [navigate, page, perPage, pagination]);
 
   return (
     <div className="container mx-auto py-10">
