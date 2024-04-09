@@ -31,6 +31,7 @@ export const Route = createFileRoute("/politicians")({
     gender,
   }),
   loader: ({
+    // @ts-ignore
     context: { queryClient },
     deps: { page, perPage, name, gender },
   }) =>
