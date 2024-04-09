@@ -28,9 +28,12 @@ services:
   backend:
     # Backend service configuration...
     
-  test:
-    # Test service configuration...
+  backend_test:
+    # Backend Test service configuration...
     
+  frontend:
+    # Frontend service configuration...
+
   elastic_setup:
     # Elasticsearch setup service configuration...
     
@@ -63,6 +66,9 @@ This command will start all the services defined in the `docker-compose.yml` fil
 
 After setting up the project using Docker Compose, you can access the following services:
 
+- Frontend Service:
+  - URL: http://localhost:3000
+  - Port: 3000
 - Backend Service:
   - URL: http://localhost:8080
   - Port: 8080
@@ -77,13 +83,22 @@ Make sure to replace `<ES_PORT>` and `<KIBANA_PORT>` with the ports defined in y
 
 ## Additional Configuration
 
-- Ensure you have set the required environment variables in the `.env` file. You can just copy `.env.local`.
+- Ensure you have set the required environment variables in the `.env` file. You can copy `.env.local`.
 - Modify the Docker Compose configuration (`docker-compose.yml`) as needed for your environment, such as adjusting ports or memory limits.
 
-## How to test endpoints instructions (demo purposes)
-We'll use `/docs` endpoint as if it was our "postman" to execute each endpoint.
+## How to test Bulk instructions (demo purposes)
 
-### Test bulk
+### Test bulk (with frontend)
+
+1. Navigate to `http://localhost:3000`
+2. Click on `Import CSV`
+3. Select the `csv` file.
+
+> To see the Import CSV button the index should not exist, to remove it you have to go to kibana at http://localhost:<KIBANA_PORT> and delete the `politicians` index
+
+### Test bulk (without frontend)
+
+We'll use `/docs` endpoint as if it was our "postman" to execute each endpoint.
 
 1. Navigate to `http://localhost:8080/docs`
 2. If the `bulk` was executed previously make sure to clear the index with `/clear_index/${index_name}` endpoint setting `politicians` as the `index_name`.
