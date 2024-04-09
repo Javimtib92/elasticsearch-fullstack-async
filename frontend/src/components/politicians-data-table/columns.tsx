@@ -41,7 +41,7 @@ export const columns: ColumnDef<Politician>[] = [
   },
   {
     accessorKey: "genero",
-    header: "Genero",
+    header: "Género",
   },
   {
     accessorKey: "partido",
