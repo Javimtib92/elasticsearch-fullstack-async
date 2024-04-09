@@ -12,8 +12,12 @@ export const Route = createRootRoute({
           </div>
         </div>
       </div>
-      <div className="flex flex-col items-end">
-        <MobileNav />
+      <div className="flex md:hidden flex-col items-end">
+        <div className="border-b w-full">
+          <div className="flex h-16 items-center px-4">
+            <MobileNav />
+          </div>
+        </div>
       </div>
       <Outlet />
     </>

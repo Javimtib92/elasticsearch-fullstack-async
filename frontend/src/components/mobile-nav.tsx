@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button } from "./ui/button";
+import { Logo } from "./logo";
 
 const NAV_ITEMS = [
   {
@@ -17,81 +18,90 @@ const NAV_ITEMS = [
     href: "/statistics",
   },
 ];
-export function MobileNav() {
+export function MobileNav({ className, ...props }: { className?: string }) {
   const [open, setOpen] = useState(false);
   const { location } = useRouterState();
 
   const inactive = "text-muted-foreground";
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button
-          variant="ghost"
-          className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
-        >
-          <svg
-            strokeWidth="1.5"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
+    <nav
+      className={cn(
+        "flex w-full justify-between items-center space-x-4 lg:space-x-6",
+        className,
+      )}
+      {...props}
+    >
+      <Logo className="w-24 text-stone-800" />
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
           >
-            <title>Menu</title>
-            <path
-              d="M3 5H11"
-              stroke="currentColor"
+            <svg
               strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M3 12H16"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M3 19H21"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span className="sr-only">Toggle Menu</span>
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="right" className="pr-0">
-        <Link
-          to="/"
-          className="flex items-center"
-          onClick={() => setOpen(false)}
-        >
-          <span className="font-bold">Newtral Tech Test</span>
-        </Link>
-        <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
-          <div className="flex flex-col space-y-3">
-            {NAV_ITEMS.map(
-              (item) =>
-                item.href && (
-                  <Link
-                    key={item.href}
-                    to={item.href}
-                    onClick={() => setOpen(false)}
-                    className={cn(
-                      "text-sm font-medium transition-colors hover:text-primary",
-                      location.pathname !== item.href && inactive,
-                    )}
-                  >
-                    {item.title}
-                  </Link>
-                ),
-            )}
-          </div>
-        </ScrollArea>
-      </SheetContent>
-    </Sheet>
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+            >
+              <title>Menu</title>
+              <path
+                d="M3 5H11"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M3 12H16"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M3 19H21"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className="sr-only">Toggle Menu</span>
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="right" className="pr-0">
+          <Link
+            to="/"
+            className="flex items-center"
+            onClick={() => setOpen(false)}
+          >
+            <span className="font-bold">Newtral Tech Test</span>
+          </Link>
+          <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
+            <div className="flex flex-col space-y-3">
+              {NAV_ITEMS.map(
+                (item) =>
+                  item.href && (
+                    <Link
+                      key={item.href}
+                      to={item.href}
+                      onClick={() => setOpen(false)}
+                      className={cn(
+                        "text-sm font-medium transition-colors hover:text-primary",
+                        location.pathname !== item.href && inactive,
+                      )}
+                    >
+                      {item.title}
+                    </Link>
+                  ),
+              )}
+            </div>
+          </ScrollArea>
+        </SheetContent>
+      </Sheet>
+    </nav>
   );
 }
