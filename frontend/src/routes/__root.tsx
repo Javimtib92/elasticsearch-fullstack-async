@@ -1,7 +1,6 @@
 import { MainNav } from "@/components/main-nav";
 import { MobileNav } from "@/components/mobile-nav";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 
 export const Route = createRootRoute({
   component: () => (
@@ -17,8 +16,6 @@ export const Route = createRootRoute({
         <MobileNav />
       </div>
       <Outlet />
-
-      <TanStackRouterDevtools />
     </>
   ),
 });

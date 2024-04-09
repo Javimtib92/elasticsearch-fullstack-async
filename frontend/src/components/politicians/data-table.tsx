@@ -21,6 +21,7 @@ import {
 import { SearchIcon } from "lucide-react";
 import type { ChangeEventHandler } from "react";
 import { DataTablePagination } from "./data-table-pagination";
+import { GenderFilter } from "./gender-filter";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -28,9 +29,11 @@ interface DataTableProps<TData, TValue> {
   pageIndex?: number;
   pageSize?: number;
   totalPages?: number;
-  initialSearch: string;
+  initialSearch?: string;
+  initialGender?: string;
   onPaginationChange: OnChangeFn<PaginationState>;
-  onSearchChange: (term: string) => void;
+  onSearchChange?: (term: string) => void;
+  onGenderFilterChange?: (gender: string) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -40,8 +43,10 @@ export function DataTable<TData, TValue>({
   pageSize = 10,
   totalPages = 0,
   initialSearch,
+  initialGender,
   onPaginationChange,
   onSearchChange,
+  onGenderFilterChange,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -59,20 +64,29 @@ export function DataTable<TData, TValue>({
   });
 
   const onSearchInputChange: ChangeEventHandler<HTMLInputElement> = (event) => {
-    onSearchChange(event?.target.value);
+    if (onSearchChange) {
+      onSearchChange(event?.target.value);
+    }
   };
 
   return (
     <div className="rounded-md border shadow-sm">
       <div className="p-4">
-        <div className="relative">
-          <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500 dark:text-gray-400" />
-          <Input
-            className="w-full bg-white shadow-none appearance-none pl-8 md:w-2/3 lg:w-1/3 dark:bg-gray-950"
-            placeholder="Search politicians..."
-            type="search"
-            defaultValue={initialSearch}
-            onChange={onSearchInputChange}
+        <div className="flex flex-col gap-4 sm:flex-row">
+          <div className="relative flex-1">
+            <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500 dark:text-gray-400" />
+            <Input
+              className="w-full bg-white shadow-none appearance-none pl-8 md:w-2/3 lg:w-1/3 dark:bg-gray-950"
+              placeholder="Search politicians..."
+              type="search"
+              defaultValue={initialSearch}
+              onChange={onSearchInputChange}
+            />
+          </div>
+
+          <GenderFilter
+            initialValue={initialGender}
+            onSelectedChange={onGenderFilterChange}
           />
         </div>
       </div>

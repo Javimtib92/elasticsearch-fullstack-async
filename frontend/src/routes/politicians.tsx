@@ -1,11 +1,11 @@
 import { columns } from "@/components/politicians/columns";
 import { DataTable } from "@/components/politicians/data-table";
 import { EmptyResults } from "@/components/politicians/empty-results";
-import { useDebounceCallback } from "@/hooks/useDebounceCallback";
+import { useDebounceCallback } from "@/hooks/use-debounce-callback";
 import { politiciansQueryOptions } from "@/react-query/politicians-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { z } from "zod";
 
 import type { PoliticiansSearch } from "@/types/politicians";
@@ -15,6 +15,7 @@ const PoliticiansSearchSchema = z.object({
   page: z.number().optional(),
   perPage: z.number().optional(),
   name: z.string().optional(),
+  gender: z.string().optional(),
 });
 
 export const Route = createFileRoute("/politicians")({
@@ -23,13 +24,19 @@ export const Route = createFileRoute("/politicians")({
 
     return validatedSearch;
   },
-  loaderDeps: ({ search: { page, perPage, name } }) => ({
+  loaderDeps: ({ search: { page, perPage, name, gender } }) => ({
     page,
     perPage,
     name,
+    gender,
   }),
-  loader: ({ context: { queryClient }, deps: { page, perPage, name } }) =>
-    queryClient.ensureQueryData(politiciansQueryOptions(page, perPage, name)),
+  loader: ({
+    context: { queryClient },
+    deps: { page, perPage, name, gender },
+  }) =>
+    queryClient.ensureQueryData(
+      politiciansQueryOptions(page, perPage, name, gender),
+    ),
   component: PoliticiansPage,
   errorComponent: (_) => {
     return <EmptyResults />;
@@ -38,9 +45,9 @@ export const Route = createFileRoute("/politicians")({
 
 function PoliticiansPage() {
   const navigate = useNavigate();
-  const { page, perPage, name } = Route.useSearch();
+  const { page, perPage, name, gender } = Route.useSearch();
   const politiciansQuery = useSuspenseQuery(
-    politiciansQueryOptions(page, perPage, name),
+    politiciansQueryOptions(page, perPage, name, gender),
   );
   const politicians = politiciansQuery.data.politicians;
   const totalPages = politiciansQuery.data.meta.totalPages;
@@ -60,11 +67,31 @@ function PoliticiansPage() {
       search: {
         page: 1,
         perPage: 10,
-        name: term || undefined, // default to undefined because I want empty strings to be undefined so that we avoid the query param to be present
+        name: term || undefined,
+        gender,
       },
       replace: true,
     });
   }, 300);
+
+  const onGenderFilterChange = useCallback(
+    (value: string) => {
+      if (!value) {
+        return;
+      }
+      navigate({
+        to: "/politicians",
+        search: {
+          page: 1,
+          perPage: 10,
+          name: search || undefined,
+          gender: value,
+        },
+        replace: true,
+      });
+    },
+    [navigate, search],
+  );
 
   useEffect(() => {
     if (page !== pagination.pageIndex + 1 || perPage !== pagination.pageSize) {
@@ -73,11 +100,12 @@ function PoliticiansPage() {
         search: {
           page: pagination.pageIndex + 1,
           perPage: pagination.pageSize,
-          name: search || undefined, // default to undefined because I want empty strings to be undefined so that we avoid the query param to be present
+          name: search || undefined,
+          gender,
         },
       });
     }
-  }, [navigate, page, perPage, pagination, search]);
+  }, [navigate, page, perPage, pagination, search, gender]);
 
   return (
     <div className="container mx-auto py-10">
@@ -88,8 +116,10 @@ function PoliticiansPage() {
         pageSize={pagination.pageSize}
         totalPages={totalPages}
         initialSearch={name}
+        initialGender={gender}
         onSearchChange={onSearchChange}
         onPaginationChange={setPagination}
+        onGenderFilterChange={onGenderFilterChange}
       />
     </div>
   );

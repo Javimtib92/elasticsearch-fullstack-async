@@ -6,7 +6,13 @@ async function getData({
   page,
   perPage,
   name,
-}: { page?: number; perPage?: number; name?: string }): Promise<{
+  gender,
+}: {
+  page?: number;
+  perPage?: number;
+  name?: string;
+  gender?: string;
+}): Promise<{
   politicians: Politician[];
   meta: { totalPages: number };
 }> {
@@ -14,6 +20,7 @@ async function getData({
     page,
     perPage,
     name,
+    gender,
   });
 
   return {
@@ -28,8 +35,9 @@ export const politiciansQueryOptions = (
   page?: number,
   perPage?: number,
   name?: string,
+  gender?: string,
 ) =>
   queryOptions({
-    queryKey: ["politicians", { page, perPage, name }],
-    queryFn: () => getData({ page, perPage, name }),
+    queryKey: ["politicians", { page, perPage, name, gender }],
+    queryFn: () => getData({ page, perPage, name, gender }),
   });

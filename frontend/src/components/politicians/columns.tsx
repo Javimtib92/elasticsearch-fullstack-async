@@ -42,6 +42,10 @@ export const columns: ColumnDef<Politician>[] = [
     header: "Nombre",
   },
   {
+    accessorKey: "genero",
+    header: "Genero",
+  },
+  {
     accessorKey: "partido",
     header: "Partido",
   },
