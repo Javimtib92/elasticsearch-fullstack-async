@@ -2,7 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { StatisticsCard } from "./statistics-card";
+import { StatisticsCard } from "../statistics-card";
 import { expect, test, beforeAll, afterAll, afterEach } from "vitest";
 
 export const handlers = [

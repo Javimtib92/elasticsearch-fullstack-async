@@ -48,7 +48,7 @@ export function StatisticsCard() {
         <div className="mt-8 grid gap-4">
           {result.data?.top_salaries.map((politician, index) => {
             return (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4" key={politician._id}>
                 <div className="w-4 text-sm text-green-400">#{index + 1}</div>
                 <img
                   alt="Avatar"
