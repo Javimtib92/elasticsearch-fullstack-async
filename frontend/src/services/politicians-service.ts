@@ -89,16 +89,11 @@ class PoliticianService {
   }
 
   async statistics(): Promise<Statistics> {
-    try {
-      const response = await fetch(`${this.baseUrl}/statistics`);
-      if (!response.ok) {
-        throw new Error("Failed to retrieve statistics");
-      }
-      return await response.json();
-    } catch (e) {
-      console.log("eerr", e);
+    const response = await fetch(`${this.baseUrl}/statistics`);
+    if (!response.ok) {
       throw new Error("Failed to retrieve statistics");
     }
+    return await response.json();
   }
 }
 

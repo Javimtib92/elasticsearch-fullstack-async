@@ -10,6 +10,7 @@ import { politicianService } from "@/services/politicians-service";
 import { formatToEur } from "@/utils/currency";
 import { useQuery } from "@tanstack/react-query";
 import { DefaultErrorBox } from "../default-error-box";
+import { EmptyResults } from "../politicians-data-table/empty-results";
 
 export function StatisticsCard() {
   const result = useQuery({
@@ -18,7 +19,7 @@ export function StatisticsCard() {
   });
 
   if (!result.data) {
-    return null;
+    return <EmptyResults />;
   }
 
   if (result.isError) {

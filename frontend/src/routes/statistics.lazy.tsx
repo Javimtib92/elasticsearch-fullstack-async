@@ -6,9 +6,5 @@ export const Route = createLazyFileRoute("/statistics")({
 });
 
 function Statistics() {
-  return (
-    <div className="p-2">
-      <StatisticsCard />
-    </div>
-  );
+  return <StatisticsCard />;
 }

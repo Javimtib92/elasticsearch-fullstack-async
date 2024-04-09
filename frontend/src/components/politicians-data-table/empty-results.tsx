@@ -11,8 +11,10 @@ export function EmptyResults() {
   const mutation = useMutation({
     mutationFn: (file: File) => politicianService.bulkUpload(file),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ["politicians"], type: "all" });
+      queryClient.invalidateQueries({ queryKey: ["politicians"], type: "all" });
       router.invalidate();
+
+      window.location.reload();
     },
     onError: () => {
       console.log("error");
