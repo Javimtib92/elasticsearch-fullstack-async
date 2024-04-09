@@ -4,13 +4,26 @@ import type {
   Statistics,
 } from "@/types/politicians";
 
+/**
+ * Service class for managing operations related to politicians.
+ */
 class PoliticianService {
   private baseUrl: string;
 
+  /**
+   * Constructs a new PoliticianService instance.
+   * @param baseUrl Base URL for API requests. Defaults to "http://localhost:8080".
+   */
   constructor(baseUrl?: string) {
     this.baseUrl = baseUrl || "http://localhost:8080";
   }
 
+  /**
+   * Uploads a file containing politician data in bulk.
+   * @param file The file to be uploaded.
+   * @returns A Promise resolving to an object with a message indicating success.
+   * @throws Error if the upload operation fails.
+   */
   async bulkUpload(file: File): Promise<{ message: string }> {
     const formData = new FormData();
     formData.append("file", file);
@@ -27,6 +40,12 @@ class PoliticianService {
     return await response.json();
   }
 
+  /**
+   * Retrieves a list of politicians based on optional search parameters.
+   * @param params Optional search parameters for filtering the results.
+   * @returns A Promise resolving to an object containing politician data and total pages.
+   * @throws Error if the fetch operation fails.
+   */
   async getPoliticians(
     params?: GetAllPoliticiansSearchParams,
   ): Promise<{ data: Politician[]; total_pages: number }> {
@@ -53,6 +72,12 @@ class PoliticianService {
     return await response.json();
   }
 
+  /**
+   * Retrieves a politician by their ID.
+   * @param id The ID of the politician to retrieve.
+   * @returns A Promise resolving to the politician object.
+   * @throws Error if the politician is not found.
+   */
   async getPoliticianById(id: number): Promise<Politician> {
     const response = await fetch(`${this.baseUrl}/politicians/${id}`);
     if (!response.ok) {
@@ -61,16 +86,23 @@ class PoliticianService {
     return await response.json();
   }
 
+  /**
+   * Updates a politician's data.
+   * @param id The ID of the politician to update.
+   * @param updatedPolitician The updated data for the politician.
+   * @returns A Promise resolving to an object with a message indicating success.
+   * @throws Error if the update operation fails.
+   */
   async updatePolitician(
     id: string,
-    newData: Politician,
+    updatedPolitician: Politician,
   ): Promise<{ message: string }> {
     const response = await fetch(`${this.baseUrl}/politicians/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(newData),
+      body: JSON.stringify(updatedPolitician),
     });
     if (!response.ok) {
       throw new Error("Failed to update politician");
@@ -78,6 +110,12 @@ class PoliticianService {
     return await response.json();
   }
 
+  /**
+   * Deletes a politician by their ID.
+   * @param id The ID of the politician to delete.
+   * @returns A Promise resolving to an object with a message indicating success.
+   * @throws Error if the delete operation fails.
+   */
   async deletePolitician(id: string): Promise<{ message: string }> {
     const response = await fetch(`${this.baseUrl}/politicians/${id}`, {
       method: "DELETE",
@@ -88,6 +126,11 @@ class PoliticianService {
     return await response.json();
   }
 
+  /**
+   * Retrieves statistics related to politicians.
+   * @returns A Promise resolving to an object containing statistics data.
+   * @throws Error if the retrieval operation fails.
+   */
   async statistics(): Promise<Statistics> {
     const response = await fetch(`${this.baseUrl}/statistics`);
     if (!response.ok) {
@@ -97,4 +140,5 @@ class PoliticianService {
   }
 }
 
+// Create a singleton instance of PoliticianService
 export const politicianService = new PoliticianService();
