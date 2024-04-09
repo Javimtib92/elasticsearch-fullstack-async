@@ -1,6 +1,6 @@
-import { columns } from "@/components/politicians/columns";
-import { DataTable } from "@/components/politicians/data-table";
-import { EmptyResults } from "@/components/politicians/empty-results";
+import { columns } from "@/components/politicians-data-table/columns";
+import { DataTable } from "@/components/politicians-data-table/data-table";
+import { EmptyResults } from "@/components/politicians-data-table/empty-results";
 import { useDebounceCallback } from "@/hooks/use-debounce-callback";
 import { politiciansQueryOptions } from "@/react-query/politicians-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
