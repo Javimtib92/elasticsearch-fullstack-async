@@ -1,6 +1,7 @@
 import type {
   GetAllPoliticiansSearchParams,
   Politician,
+  Statistics,
 } from "@/types/politicians";
 
 class PoliticianService {
@@ -81,6 +82,14 @@ class PoliticianService {
     const response = await fetch(`${this.baseUrl}/politicians/${id}`, {
       method: "DELETE",
     });
+    if (!response.ok) {
+      throw new Error("Failed to delete politician");
+    }
+    return await response.json();
+  }
+
+  async statistics(): Promise<Statistics> {
+    const response = await fetch(`${this.baseUrl}/statistics`);
     if (!response.ok) {
       throw new Error("Failed to delete politician");
     }
