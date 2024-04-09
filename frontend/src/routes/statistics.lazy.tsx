@@ -1,3 +1,4 @@
+import { StatisticsCard } from "@/components/statistics-card/statistics-card";
 import { createLazyFileRoute } from "@tanstack/react-router";
 
 export const Route = createLazyFileRoute("/statistics")({
@@ -5,5 +6,9 @@ export const Route = createLazyFileRoute("/statistics")({
 });
 
 function Statistics() {
-  return <div className="p-2">Hello from Statistics!</div>;
+  return (
+    <div className="p-2">
+      <StatisticsCard />
+    </div>
+  );
 }
