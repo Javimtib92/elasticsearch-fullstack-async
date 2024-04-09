@@ -4,6 +4,34 @@
 
 This README file serves as a guide to help you understand the structure of the project, how to set it up, and how to get started with development.
 
+## Getting Started
+
+To get started with the project, follow these steps:
+
+1. Clone the repository
+
+```bash
+git clone git@github.com:Javimtib92/newtral-tech-test.git <project_name>
+```
+
+2. Navigate to the project directory
+
+```bash
+cd <project_name>
+```
+
+3. Run docker-compose
+
+```bash
+docker-compose up
+```
+
+> ⚠️ Remember to start Docker Desktop first. To install docker-compose follow this guideline: https://docs.docker.com/compose/install/#installation-scenarios
+
+This command will start all the services defined in the `docker-compose.yml` file.
+
+> ☕ Sit down and drink a relaxing cup of cafe con leche because this will take a while the first time it has to pull the images
+
 ## Docker Compose Setup
 
 I use Docker Compose to simplify the setup and deployment of the project. Below is the configuration for Docker Compose:
@@ -43,24 +71,6 @@ services:
   kibana:
     # Kibana service configuration...
 ```
-
-To install docker-compose follow this guideline: https://docs.docker.com/compose/install/#installation-scenarios
-
-For me the best way to install it is by installing `Docker Desktop`.
-
-## Running the Project
-
-> ⚠️ Remember to start Docker Desktop first
-
-To start the project, navigate to the project directory containing the `docker-compose.yml` file and run:
-
-```bash
-docker-compose up
-```
-
-This command will start all the services defined in the `docker-compose.yml` file.
-
-> ☕ Sit down and drink a relaxing cup of cafe con leche because this will take a while the first time it has to pull the images
 
 ## Accessing Services
 
