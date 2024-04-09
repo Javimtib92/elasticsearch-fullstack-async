@@ -66,7 +66,7 @@ test("renders statistics card correctly", async () => {
   });
 });
 
-test("renders error message when API request fails", async () => {
+test("renders no politician data when api fails", async () => {
   server.use(
     http.get("http://localhost:8080/statistics", () => {
       return new Response("error", { status: 500 });
@@ -79,7 +79,6 @@ test("renders error message when API request fails", async () => {
     </QueryClientProvider>,
   );
 
-  // Wait for error message to be rendered
   await waitFor(() => {
     expect(screen.getByText("No politicians data")).toBeInTheDocument();
   });
