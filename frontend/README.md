@@ -60,6 +60,12 @@ frontend/
 ├── public/
 ├── src/
 │   ├── components/
+│   │   ├── statistics-card/
+│   │   │   ├── __tests__/
+│   │   │   │   ├── example.test.ts
+│   │   │   │   ├── ...
+│   │   │   └── __mocks__/
+│   │   │       └── example.mock.ts
 │   ├── hooks/
 │   ├── lib/
 │   ├── react-query/
@@ -125,9 +131,35 @@ frontend/
 - `tsconfig.node.json`: Configuration file for TypeScript targeting Node.js runtime.
 - `vite.config.ts`: Configuration file for Vite, a build tool that aims to provide a faster and leaner development experience. Refer to [Vite docs](https://vitejs.dev) for more information
 
+## Tests
+
+This project utilizes `Vitest` and `MSW` for testing. Tests are typically located in the __tests__ folder, while relevant mocks are placed alongside the tests in the __mocks__ folder.
+
+### Vitest
+
+Vitest is a test runner designed specifically for Vite projects. It provides a fast and efficient testing experience by leveraging Vite's native ES module support and HMR capabilities. With Vitest, you can write and run tests with minimal configuration, making it an ideal choice for testing Vite-based applications.
+
+
+### MSW
+
+MSW is a powerful library for mocking HTTP requests in browser-based applications. It allows you to intercept requests made by your application and respond with predefined mock data or custom logic. By using MSW, you can simulate various network scenarios and ensure that your application behaves correctly under different conditions.
+
+### Running Tests
+To run tests, follow these steps:
+
+1. Navigate to the project directory in your terminal.
+2. Execute the following command to run the tests:
+```bash
+npm run test / yarn test / pnpm test
+```
+This command will find and execute all files that include `.test` or `.spec`.
+
+
 ## Resources
 
 - [Vite](https://vitejs.dev) - Vite is a build tool that aims to provide a faster and leaner development experience.
+- [Vitest](https://vitest.dev) - Vitest is a test runner designed specifically for Vite projects.
+- [MSW](https://mswjs.io) - Mock Service Worker is a powerful library for mocking HTTP requests in browser-based applications.
 - [React](https://reactjs.org) - React is a JavaScript library for building user interfaces.
 - [React Tanstack Query](https://tanstack.com/query/latest) - React Tanstack Query is a data fetching and caching library for React.
 - [React Tanstack Router](https://tanstack.com/router/latest) - React Tanstack Router is a routing library for React applications.
