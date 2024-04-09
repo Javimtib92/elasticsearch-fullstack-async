@@ -7,7 +7,9 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { politicianService } from "@/services/politicians-service";
+import { formatToEur } from "@/utils/currency";
 import { useQuery } from "@tanstack/react-query";
+import { DefaultErrorBox } from "../default-error-box";
 
 export function StatisticsCard() {
   const result = useQuery({
@@ -15,28 +17,38 @@ export function StatisticsCard() {
     queryFn: () => politicianService.statistics(),
   });
 
+  if (!result.data) {
+    return null;
+  }
+
+  if (result.isError) {
+    return <DefaultErrorBox message={result.error.message} />;
+  }
+
   return (
     <Card className="mx-auto max-w-3xl">
       <CardHeader className="grid items-center gap-1">
         <CardTitle className="text-3xl font-bold">
-          {result.data?.mean_salary}
+          {formatToEur(result.data?.mean_salary)}
         </CardTitle>
-        <CardDescription>Mean Salary</CardDescription>
+        <CardDescription>Salario medio</CardDescription>
       </CardHeader>
       <CardContent>
         <div />
       </CardContent>
       <CardFooter className="grid items-center gap-1">
         <CardTitle className="text-3xl font-bold">
-          {result.data?.median_salary}
+          {formatToEur(result.data?.median_salary)}
         </CardTitle>
-        <CardDescription>Median Salary</CardDescription>
+        <CardDescription>Mediana de salarios</CardDescription>
       </CardFooter>
-      <CardContent>
-        <div className="mt-1 grid gap-2">
-          {result.data?.top_salaries.map((politician) => {
+      <CardContent className="mt-8">
+        <h1 className="text-2xl font-bold">Top 10 salarios Estado Español</h1>
+        <div className="mt-8 grid gap-4">
+          {result.data?.top_salaries.map((politician, index) => {
             return (
               <div className="flex items-center gap-4">
+                <div className="w-4 text-sm text-green-400">#{index + 1}</div>
                 <img
                   alt="Avatar"
                   className="rounded-full"
@@ -57,7 +69,7 @@ export function StatisticsCard() {
                   </div>
                 </div>
                 <div className="ml-auto font-semibold">
-                  {politician.retribucionanual}
+                  {formatToEur(politician.retribucionanual)}
                 </div>
               </div>
             );

@@ -19,8 +19,8 @@ export type Politician = {
 };
 
 export type Statistics = {
-  mean_salary: string;
-  median_salary: string;
+  mean_salary: number;
+  median_salary: number;
   top_salaries: Politician[];
 };
 

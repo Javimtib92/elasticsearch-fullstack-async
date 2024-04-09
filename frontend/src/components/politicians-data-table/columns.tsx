@@ -4,14 +4,12 @@ import type { ColumnDef, Row } from "@tanstack/react-table";
 
 import type { Politician } from "@/types/politicians";
 import { Actions } from "./actions/actions";
+import { formatToEur } from "@/utils/currency";
 
 function toCurrencyCell(field: keyof Politician) {
   return ({ row }: { row: Row<Politician> }) => {
     const sueldoBase = Number.parseFloat(row.getValue(field));
-    const formatted = new Intl.NumberFormat("es-ES", {
-      style: "currency",
-      currency: "EUR",
-    }).format(sueldoBase);
+    const formatted = formatToEur(sueldoBase);
 
     return <div className="text-right font-medium">{formatted}</div>;
   };
