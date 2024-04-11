@@ -7,16 +7,16 @@ volumes:
    driver: local
 
 networks:
- default:
-   name: elastic
-   external: false
+  elastic:
+    name: elastic
+    external: false
 
 services:
   backend:
     image: '${DOCKER_IMAGE_BACKEND}:${TAG-latest}'
     restart: always
     networks:
-      - default
+      - elastic
     env_file: .env
     environment:
       - DOMAIN=${DOMAIN}
@@ -24,7 +24,7 @@ services:
     build:
       context: ./backend
       args:
-        INSTALL_DEV: ${INSTALL_DEV-false}
+        INSTALL_DEV: false
     ports:
       - "127.0.0.1:8080:80"
     platform: linux/amd64 # Patch for M1 Mac
@@ -36,13 +36,12 @@ services:
       context: ./backend
       dockerfile: Dockerfile-test
       args:
-        INSTALL_DEV: ${INSTALL_DEV-true}
+        INSTALL_DEV: true
     env_file: .env.test
     environment:
       - DOMAIN=${DOMAIN}
       - ENVIRONMENT=${ENVIRONMENT}
     volumes:
-      - certs:/usr/share/backend/config/certs
       - ./app/:/usr/src/app/
     stdin_open: true
     depends_on:
@@ -51,8 +50,6 @@ services:
   frontend:
     image: '${DOCKER_IMAGE_FRONTEND}:${TAG-latest}'
     restart: always
-    networks:
-      - default
     build:
       context: ./frontend
       args:
@@ -117,6 +114,8 @@ services:
      retries: 120
 
   es01:
+    networks:
+      - elastic
     depends_on:
       elastic_setup:
         condition: service_healthy
@@ -159,6 +158,8 @@ services:
       retries: 120
 
   kibana:
+   networks:
+      - elastic
    depends_on:
      es01:
        condition: service_healthy
