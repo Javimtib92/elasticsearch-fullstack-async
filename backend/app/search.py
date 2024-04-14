@@ -41,14 +41,14 @@ async def get_es() -> Optional[Search]:
     return Search()
 
 
-type_map: Dict[type, str] = {
-    str: "keyword",
-    datetime: "date",
-    int: "long",
-    float: "float",
-    list: "keyword",
-    dict: "nested",
-    List[BaseModel]: "nested",
+type_map: Dict[type, Dict[str, str]] = {
+    str: {"type": "keyword", "null_value": ""},
+    datetime: {"type": "date", "null_value": ""},
+    int: {"type": "long", "null_value": 0},
+    float: {"type": "float", "null_value": 0},
+    list: {"type": "keyword", "null_value": ""},
+    dict: {"type": "nested"},
+    List[BaseModel]: {"type": "nested"}
 }
 
 
@@ -79,5 +79,5 @@ def create_es_mapping(pydantic_model: BaseModel) -> Dict[str, str]:
         ):
             mapping[field] = {"type": "text", "fields": {"raw": {"type": "keyword"}}}
         else:
-            mapping[field] = {"type": es_field_type}
+            mapping[field] = {"type": es_field_type.get('type'), "null_value": es_field_type.get('null_value')}
     return mapping

@@ -1,7 +1,8 @@
 from math import ceil
 import os
-import csv
-import io
+from fastapi.concurrency import run_in_threadpool
+import pandas as pd
+import numpy as np
 from contextlib import asynccontextmanager
 from typing import List, Optional
 
@@ -21,8 +22,6 @@ from app.schemas import (
     StatisticsResponse,
 )
 from app.search import Search, create_es_mapping, get_es
-from app.utils import is_float
-
 
 @asynccontextmanager
 async def lifespan(_: FastAPI, es: Optional[Search] = Depends(get_es)):
@@ -103,28 +102,14 @@ async def clear_index_endpoint(
     }
 
 
-def csv_row_generator(upload_file):
-    with io.TextIOWrapper(
-        upload_file.file,
-        # using utf-8-sig encoding as suggested by https://github.com/clld/clldutils/issues/65#issuecomment-344953000
-        encoding="utf-8-sig",
-        newline="",
-    ) as text_file:
-        csv_reader = csv.reader(text_file, delimiter=";")
-
-        headers = next(csv_reader)
-
-        for row in csv_reader:
-            data = {}
-            for index, header in enumerate(headers):
-                value = row[index]
-
-                if is_float(value):
-                    value = float(value.replace(",", "."))
-
-                data[header.lower()] = value
-
-            yield {"_index": "politicians", **data}
+async def csv_row_generator(upload_file):
+    df = await run_in_threadpool(pd.read_csv, upload_file.file, delimiter=";", decimal=",", engine="c", encoding="utf-8-sig")
+    df = df.replace(np.nan, None)
+    df = df.rename(lambda x: x.lower(), axis='columns')
+    
+    for data in df.to_dict(orient="records"):
+        yield {"_index": "politicians", **data}
+        
 
 
 @app.post(

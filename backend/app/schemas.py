@@ -35,7 +35,7 @@ class Politician(BaseModel):
     )
     @classmethod
     def string_to_float(cls, value: str) -> float:
-        if value == "":
+        if value is None:
             return 0.0
         try:
             return float(value)
