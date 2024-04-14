@@ -100,17 +100,7 @@ async def clear_index_endpoint(
     return {
         "message": f"All documents in index {index_name} have been successfully cleared"
     }
-
-
-async def csv_row_generator(upload_file):
-    df = await run_in_threadpool(pd.read_csv, upload_file.file, delimiter=";", decimal=",", engine="c", encoding="utf-8-sig")
-    df = df.replace(np.nan, None)
-    df = df.rename(lambda x: x.lower(), axis='columns')
-    
-    for data in df.to_dict(orient="records"):
-        yield {"_index": "politicians", **data}
         
-
 
 @app.post(
     "/bulk",
@@ -152,7 +142,14 @@ async def bulk(file: UploadFile = File(...), es: Optional[Search] = Depends(get_
 
     return {"message": "success"}
 
-
+async def csv_row_generator(upload_file):
+    df = await run_in_threadpool(pd.read_csv, upload_file.file, delimiter=";", decimal=",", engine="c", encoding="utf-8-sig")
+    df = df.replace(np.nan, None)
+    df = df.rename(lambda x: x.lower(), axis='columns')
+    
+    for data in df.to_dict(orient="records"):
+        yield {"_index": "politicians", **data}
+        
 @app.get(
     "/politicians",
     response_model=PoliticiansPaginated,
