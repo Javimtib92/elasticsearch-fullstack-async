@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils";
-import { Link } from "@tanstack/react-router";
+import { Link, type LinkComponent } from "@tanstack/react-router";
 
-export function Logo({ className }: { className?: string }) {
+export function Logo({ onClick, className, ...props }: Partial<LinkComponent<"a">> & { onClick?: () => void; className?: string }) {
 	return (
-		<Link to="/politicians">
+		<Link to="/politicians" onClick={onClick} {...props}>
 			<svg
 				className={cn("svg-logo", className)}
 				width="234"

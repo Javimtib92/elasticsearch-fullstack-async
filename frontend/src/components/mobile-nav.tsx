@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 import { Logo } from "@/components/logo";
-import { BurgerMenu } from "@/components/burger-menu";
+import { BurgerMenu } from "./burger-menu";
 
 const NAV_ITEMS = [
   {
@@ -35,18 +35,10 @@ export function MobileNav({ className, ...props }: { className?: string }) {
       <Logo className="w-24 text-stone-800" />
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <BurgerMenu />
+          <BurgerMenu/>
         </SheetTrigger>
         <SheetContent side="right" className="pr-0">
-          <Link
-            to="/"
-            className="flex items-center"
-            onClick={() => setOpen(false)}
-          >
-            <span className="font-bold">
-              <Logo className="w-24 text-stone-800" />
-            </span>
-          </Link>
+          <Logo className="w-24 text-stone-800" onClick={() => setOpen(false)}/>
           <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
             <div className="flex flex-col space-y-3">
               {NAV_ITEMS.map(
