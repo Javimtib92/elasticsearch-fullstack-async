@@ -1,4 +1,3 @@
-import { CheckIcon } from "lucide-react";
 import { useComboBox } from "@/components/ui/combo-box";
 import {
   Command,
@@ -8,6 +7,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import { CheckIcon } from "lucide-react";
 import { useEffect } from "react";
 
 type FilterOption = {

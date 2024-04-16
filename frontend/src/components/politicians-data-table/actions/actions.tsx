@@ -10,8 +10,8 @@ import {
 
 import type { Politician } from "@/types/politicians";
 import { MoreHorizontal } from "lucide-react";
-import { EditAction } from "./edit";
 import { DeleteAction } from "./delete";
+import { EditAction } from "./edit";
 
 export function Actions({ politician }: { politician: Politician }) {
   const [dropdownMenuOpen, setDropdownMenuOpen] = useState(false);
