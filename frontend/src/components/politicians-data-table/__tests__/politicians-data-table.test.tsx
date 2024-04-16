@@ -1,8 +1,8 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { DataTable } from "../data-table";
-import { describe, test, expect, vi } from "vitest";
-import { columns } from "../columns";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, test, vi } from "vitest";
 import { mockData } from "../__mocks__/politicians.mock";
+import { columns } from "../columns";
+import { DataTable } from "../data-table";
 
 const onPaginationChange = vi.fn();
 const onSearchChange = vi.fn();

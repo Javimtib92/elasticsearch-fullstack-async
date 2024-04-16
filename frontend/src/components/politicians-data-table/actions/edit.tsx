@@ -1,9 +1,4 @@
-import {
-  type Dispatch,
-  type FormEventHandler,
-  type SetStateAction,
-  useState,
-} from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -17,10 +12,15 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { politicianService } from "@/services/politicians-service";
 import type { Politician } from "@/types/politicians";
-import { Button } from "@/components/ui/button";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  type Dispatch,
+  type FormEventHandler,
+  type SetStateAction,
+  useState,
+} from "react";
 
 export function EditAction({
   politician,

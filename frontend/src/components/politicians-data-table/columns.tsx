@@ -3,8 +3,8 @@
 import type { ColumnDef, Row } from "@tanstack/react-table";
 
 import type { Politician } from "@/types/politicians";
-import { Actions } from "./actions/actions";
 import { formatToEur } from "@/utils/currency";
+import { Actions } from "./actions/actions";
 
 function toCurrencyCell(field: keyof Politician) {
   return ({ row }: { row: Row<Politician> }) => {

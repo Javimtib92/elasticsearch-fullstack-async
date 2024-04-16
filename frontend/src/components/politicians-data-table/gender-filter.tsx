@@ -1,5 +1,5 @@
-import { ComboBoxResponsive } from "@/components/ui/combo-box";
 import { Filter } from "@/components/filter";
+import { ComboBoxResponsive } from "@/components/ui/combo-box";
 
 const options = [
   { label: "Hombre", value: "Hombre" },
