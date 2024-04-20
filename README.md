@@ -1,7 +1,48 @@
 # Elasticsearch Fullstack Async
 
-## Introduction
+## Why I did this project
 
+This project was part of a take home challenge.
+
+I was asked to build from scratch a fullstack project with an API in Python, Elasticsearch as the DB and any frontend framework as the front.
+
+> Before this test, I had only used Python for some web scraping projects, and I had never used Elasticsearch before, so I had to learn on the go. This challenge was meant to test my ability to adapt to new technologies.
+
+
+The API initially had to consists of the following endpoints (In the end I added some additional ones)
+
+- `bulk` (to import a csv)
+- `getAll`
+- `getById`
+- `update`
+- `delete`
+
+The tech stack I decided to use is this one:
+
+**Backend:**
+- Python 3.11
+- Poetry
+- Fastapi
+- Elasticsearch-py
+- pandas
+- numpy
+- pytest
+
+**Frontend:**
+- Typescript
+- Vite
+- Vitest
+- Biomejs
+- React
+- React Tanstack Query
+- React Tanstack Router
+- Zod
+- Tailwindcss
+- Shadcn
+
+Maybe someone else will find this project useful as a starting point for this tech stack.
+
+## Introduction 
 This README file serves as a guide to help you understand the structure of the project, how to set it up, and how to get started with development.
 
 ## Getting Started
