@@ -98,6 +98,9 @@ Make sure to replace `<ES_PORT>` and `<KIBANA_PORT>` with the ports defined in y
 
 ## How to test Bulk instructions (demo purposes)
 
+> There is a sample of a data file to import located in `data/import.csv`
+
+
 ### Test bulk (with frontend)
 
 1. Navigate to `http://localhost:3000`
