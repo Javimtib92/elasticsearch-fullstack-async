@@ -11,7 +11,7 @@ To get started with the project, follow these steps:
 1. Clone the repository
 
 ```bash
-git clone git@github.com:Javimtib92/fullstack-challenge-python.git <project_name>
+git clone git@github.com:Javimtib92/fullstack-challenge-elastic.git <project_name>
 ```
 
 2. Navigate to the project directory
