@@ -1,4 +1,4 @@
-# Newtral Tech Test Backend
+# Fullstack challenge Backend
 
 ## Project Overview
 
