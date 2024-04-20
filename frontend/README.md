@@ -1,4 +1,4 @@
-# Newtral Tech Test Frontend
+# Elasticsearch Fullstack Async Frontend
 
 ## Project Overview
 

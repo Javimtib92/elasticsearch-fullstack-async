@@ -1,4 +1,4 @@
-# newtral-tech-test
+# Elasticsearch Fullstack Async
 
 ## Introduction
 
@@ -11,7 +11,7 @@ To get started with the project, follow these steps:
 1. Clone the repository
 
 ```bash
-git clone git@github.com:Javimtib92/newtral-tech-test.git <project_name>
+git clone git@github.com:Javimtib92/elasticsearch-fullstack-async.git <project_name>
 ```
 
 2. Navigate to the project directory
@@ -97,6 +97,9 @@ Make sure to replace `<ES_PORT>` and `<KIBANA_PORT>` with the ports defined in y
 - Modify the Docker Compose configuration (`docker-compose.yml`) as needed for your environment, such as adjusting ports or memory limits.
 
 ## How to test Bulk instructions (demo purposes)
+
+> There is a sample of a data file to import located in `data/import.csv`
+
 
 ### Test bulk (with frontend)
 

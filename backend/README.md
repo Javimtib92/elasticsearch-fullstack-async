@@ -1,4 +1,4 @@
-# Newtral Tech Test Backend
+# Elasticsearch Fullstack Async Backend
 
 ## Project Overview
 
